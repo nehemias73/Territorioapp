@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Territorios</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Territorios - Congregación Norte</h1>
+        <p>Registro de Predicación</p>
+    </header>
+
+    <div class="container">
+        <!-- Contenedor de Búsqueda y Acciones -->
+        <div class="search-container" style="display: flex; gap: 10px;">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar territorio por número o nombre..." oninput="filterTerritories()">
+            <!-- Nuevo Botón S-13 -->
+            <button onclick="printS13()" class="btn btn-primary" style="width: auto; white-space: nowrap;">
+                🖨️ Imprimir S-13
+            </button>
+        </div>
+
+        <!-- Grilla -->
+        <div id="grid" class="grid">
+            <div class="loading">Cargando territorios...</div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            
+            <h2 id="modalTitle" style="margin-top:0;">Territorio 00</h2>
+            
+            <!-- Botonera de Mapa / Imagen -->
+            <div class="media-preview" id="mediaPreview">
+                <!-- Aquí se inyecta la imagen o el mensaje -->
+            </div>
+            
+            <div id="mapLinkContainer" style="margin-bottom: 20px; text-align: center;">
+                <!-- Aquí se inyecta el botón de ir al mapa -->
+            </div>
+
+            <form id="territoryForm">
+                <input type="hidden" id="territoryId">
+
+                <div class="form-group">
+                    <label for="status">Estado actual:</label>
+                    <select id="status" onchange="toggleFields()">
+                        <option value="Disponible">Disponible</option>
+                        <option value="Incompleto">Incompleto</option>
+                        <option value="Completo">Completo</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="groupNotes" style="display:none;">
+                    <label for="notes">Notas (¿Qué se hizo?):</label>
+                    <textarea id="notes" rows="3" placeholder="Explica brevemente qué falta o qué se trabajó..."></textarea>
+                </div>
+
+                <div class="form-group" id="groupPublisher">
+                    <label for="publisher">Publicador:</label>
+                    <input type="text" id="publisher" placeholder="Ej: Hno. Pérez">
+                </div>
+
+                <div class="form-group">
+                    <label for="dateStart">Fecha Inicio:</label>
+                    <input type="date" id="dateStart">
+                </div>
+
+                <div class="form-group">
+                    <label for="dateEnd">Fecha Fin:</label>
+                    <input type="date" id="dateEnd">
+                </div>
+
+                <!-- Campo Opcional para editar el link del mapa -->
+                <div class="form-group" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+                    <label for="mapaUrl" style="font-size: 0.8rem; color: #666;">🔗 Enlace Google Maps (Opcional):</label>
+                    <input type="url" id="mapaUrl" placeholder="https://maps.app.goo.gl/..." style="font-size: 0.9rem;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="saveBtn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

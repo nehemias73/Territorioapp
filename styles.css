@@ -1,0 +1,154 @@
+/* --- VARIABLES Y CONFIGURACIÓN --- */
+:root {
+    --color-primary: #4A6DA7;
+    --color-bg: #F4F6F8;
+    --color-card: #FFFFFF;
+    --color-text: #333333;
+    --color-success: #4CAF50;
+    --color-warning: #FF9800;
+    --color-info: #2196F3;
+    --color-map: #EA4335; /* Rojo Google Maps */
+    --radius: 8px;
+    --shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+header h1 { margin: 0; font-size: 1.5rem; font-weight: 500; }
+header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+.search-container { margin-bottom: 20px; }
+.search-input {
+    width: 100%; padding: 15px; border: 1px solid #ddd;
+    border-radius: var(--radius); font-size: 1.1rem;
+    box-shadow: var(--shadow); outline: none; transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--color-primary); }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--color-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: transform 0.2s;
+    cursor: pointer;
+    border-left: 5px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover { transform: translateY(-3px); }
+
+.card.disponible { border-left-color: var(--color-success); }
+.card.incompleto { border-left-color: var(--color-warning); }
+.card.completo { border-left-color: var(--color-info); }
+
+.card-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.card-title { font-weight: bold; font-size: 1.1rem; }
+
+.badge {
+    padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;
+    color: white; text-transform: uppercase; font-weight: bold;
+}
+.badge.disponible { background-color: var(--color-success); }
+.badge.incompleto { background-color: var(--color-warning); }
+.badge.completo { background-color: var(--color-info); }
+
+.card-body { padding: 15px; flex-grow: 1; }
+.card-actions {
+    padding: 10px 15px;
+    background: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+.info-row {
+    margin-bottom: 8px; font-size: 0.9rem;
+    display: flex; align-items: center;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); display: none;
+    justify-content: center; align-items: center; z-index: 1000; padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+    background: white; padding: 20px; border-radius: var(--radius);
+    width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute; top: 15px; right: 15px; background: none;
+    border: none; font-size: 1.5rem; cursor: pointer; color: #777;
+}
+
+.media-preview {
+    width: 100%; height: 150px; background-color: #eee;
+    margin-bottom: 10px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    color: #888; overflow: hidden;
+}
+.media-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
+input, select, textarea {
+    width: 100%; padding: 10px; border: 1px solid #ddd;
+    border-radius: 4px; font-size: 1rem; box-sizing: border-box; font-family: inherit;
+}
+textarea { resize: vertical; }
+
+.btn {
+    width: 100%; padding: 12px; border: none; border-radius: 4px;
+    font-size: 1rem; cursor: pointer; font-weight: bold;
+    transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none; /* Para links que parecen botones */
+}
+
+.btn-primary { background-color: var(--color-primary); color: white; }
+.btn-primary:hover { background-color: #3b5a8c; }
+.btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
+
+/* Botón Mapa */
+.btn-map {
+    background-color: white; color: var(--color-map);
+    border: 1px solid var(--color-map);
+    padding: 8px; font-size: 0.9rem;
+}
+.btn-map:hover { background-color: #fff5f5; }
+
+.loading { text-align: center; padding: 40px; font-size: 1.2rem; color: #666; }
