@@ -4,10 +4,13 @@
     --color-bg: #F4F6F8;
     --color-card: #FFFFFF;
     --color-text: #333333;
+    
+    /* ESTADOS */
     --color-success: #4CAF50;
-    --color-warning: #FF9800;
+    --color-assigned: #D32F2F;
     --color-info: #2196F3;
-    --color-map: #EA4335; /* Rojo Google Maps */
+    
+    --color-map: #EA4335;
     --radius: 8px;
     --shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -37,13 +40,42 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     padding: 0 15px;
 }
 
-.search-container { margin-bottom: 20px; }
-.search-input {
-    width: 100%; padding: 15px; border: 1px solid #ddd;
-    border-radius: var(--radius); font-size: 1.1rem;
-    box-shadow: var(--shadow); outline: none; transition: border-color 0.2s;
+/* Barra de Herramientas */
+.search-container {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
-.search-input:focus { border-color: var(--color-primary); }
+
+.search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px; 
+    border: 1px solid #ddd;
+    border-radius: var(--radius); 
+    font-size: 1rem;
+    box-shadow: var(--shadow); 
+    outline: none;
+}
+
+.search-select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    box-shadow: var(--shadow);
+    background-color: white;
+    cursor: pointer;
+}
+
+.btn-print {
+    width: auto !important;
+    white-space: nowrap;
+    padding: 0 20px !important;
+}
+
+.search-input:focus, .search-select:focus { border-color: var(--color-primary); }
 
 .grid {
     display: grid;
@@ -51,6 +83,7 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     gap: 20px;
 }
 
+/* Tarjeta */
 .card {
     background: var(--color-card);
     border-radius: var(--radius);
@@ -66,8 +99,8 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
 .card:hover { transform: translateY(-3px); }
 
 .card.disponible { border-left-color: var(--color-success); }
-.card.incompleto { border-left-color: var(--color-warning); }
-.card.completo { border-left-color: var(--color-info); }
+.card.asignado { border-left-color: var(--color-assigned); } 
+.card.completado { border-left-color: var(--color-info); }
 
 .card-header {
     padding: 15px;
@@ -82,8 +115,8 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     color: white; text-transform: uppercase; font-weight: bold;
 }
 .badge.disponible { background-color: var(--color-success); }
-.badge.incompleto { background-color: var(--color-warning); }
-.badge.completo { background-color: var(--color-info); }
+.badge.asignado { background-color: var(--color-assigned); } 
+.badge.completado { background-color: var(--color-info); }
 
 .card-body { padding: 15px; flex-grow: 1; }
 .card-actions {
@@ -97,7 +130,7 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     display: flex; align-items: center;
 }
 
-/* Modal */
+/* Modal Formulario */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.5); display: none;
@@ -124,6 +157,40 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
 }
 .media-preview img { width: 100%; height: 100%; object-fit: cover; }
 
+/* NUEVO: Lightbox para ver imagen en grande */
+.lightbox-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    cursor: zoom-out;
+}
+
+.lightbox-overlay.active { display: flex; }
+
+.lightbox-overlay img {
+    max-width: 95%;
+    max-height: 95%;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    cursor: default;
+    object-fit: contain;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
 .form-group { margin-bottom: 15px; }
 label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
 input, select, textarea {
@@ -136,18 +203,20 @@ textarea { resize: vertical; }
     width: 100%; padding: 12px; border: none; border-radius: 4px;
     font-size: 1rem; cursor: pointer; font-weight: bold;
     transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-    text-decoration: none; /* Para links que parecen botones */
+    text-decoration: none; 
 }
 
 .btn-primary { background-color: var(--color-primary); color: white; }
 .btn-primary:hover { background-color: #3b5a8c; }
 .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
 
-/* Botón Mapa */
+/* ESTILOS DEL BOTÓN DE MAPA */
 .btn-map {
     background-color: white; color: var(--color-map);
     border: 1px solid var(--color-map);
     padding: 8px; font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
 }
 .btn-map:hover { background-color: #fff5f5; }
 
