@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Territorios</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Territorios</h1>
+        <p>Registro de Predicación</p>
+    </header>
+
+    <div class="container">
+        <!-- Contenedor de Búsqueda y Filtros -->
+        <a href="index.html" class="back-link">
+            <span>⬅</span> Volver al Menú
+        </a>
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar por número, nombre o publicador..." oninput="filterTerritories()">
+            
+            <select id="statusFilter" class="search-select" onchange="filterTerritories()">
+                <option value="">Todos los estados</option>
+                <option value="Disponible">🟢 Disponible</option>
+                <option value="Asignado">🔴 Asignado</option>
+                <option value="Completado">🔵 Completado</option>
+            </select>
+
+            <button onclick="printS13()" class="btn btn-primary btn-print">
+                🖨️ S-13
+            </button>
+        </div>
+
+        <!-- Grilla -->
+        <div id="grid" class="grid">
+            <div class="loading">Cargando territorios...</div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            
+            <h2 id="modalTitle" style="margin-top:0;">Territorio 00</h2>
+            
+            <div class="media-preview" id="mediaPreview">
+                <!-- Imagen mapa -->
+            </div>
+            
+            <div id="mapLinkContainer" style="margin-bottom: 20px; text-align: center;">
+                <!-- Botón ir al mapa -->
+            </div>
+
+            <form id="territoryForm">
+                <input type="hidden" id="territoryId">
+
+                <div class="form-group">
+                    <label for="status">Estado actual:</label>
+                    <select id="status" onchange="toggleFields()">
+                        <option value="Disponible">Disponible (En estante)</option>
+                        <option value="Asignado">Asignado (En trabajo)</option>
+                        <option value="Completado">Completado</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="groupNotes">
+                    <label for="notes">Notas (Opcional):</label>
+                    <textarea id="notes" rows="3" placeholder="Si se completó, ¿quedó algo pendiente?"></textarea>
+                </div>
+
+                <div class="form-group" id="groupPublisher">
+                    <label for="publisher">Publicador:</label>
+                    <input type="text" id="publisher" placeholder="Ej: Hno. Pérez">
+                </div>
+
+                <div class="form-group">
+                    <label for="dateStart">Fecha Asignación (Inicio):</label>
+                    <input type="date" id="dateStart">
+                </div>
+
+                <div class="form-group">
+                    <label for="dateEnd">Fecha Completado (Fin):</label>
+                    <input type="date" id="dateEnd">
+                </div>
+
+                <!-- El campo de URL de Mapa ha sido eliminado de aquí -->
+
+                <button type="submit" class="btn btn-primary" id="saveBtn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Imagen Completa (Lightbox) -->
+    <div id="lightboxOverlay" class="lightbox-overlay" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImage" src="" alt="Imagen Completa">
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

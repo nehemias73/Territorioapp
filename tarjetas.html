@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarjetas de Territorio</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* Ajustes específicos para esta página */
+        
+        /* Botón volver */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: 0.2s;
+        }
+        .back-link:hover { color: var(--color-primary); transform: translateX(-3px); }
+        
+        /* --- NUEVO: ESTILOS PARA TARJETAS COMPACTAS --- */
+        
+        /* Sobreescribimos la configuración del grid solo para esta ID */
+        #grid-tarjetas {
+            display: grid;
+            /* Tarjetas mucho más chicas (mínimo 140px en lugar de 280px) */
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        /* Ajustes internos para que el contenido quepa en tarjeta chica */
+        #grid-tarjetas .card-header {
+            padding: 8px; /* Menos relleno */
+            font-size: 0.85rem; /* Texto más chico */
+            justify-content: center; /* Centrado */
+        }
+        
+        /* Ocultar el badge "Ver" para ahorrar espacio, ya es obvio que se puede tocar */
+        #grid-tarjetas .card-header .badge {
+            display: none; 
+        }
+
+        #grid-tarjetas .card-title {
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        #grid-tarjetas .card-body {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ajuste del número grande */
+        .card-number-big {
+            font-size: 2rem; /* Reducido de 2.5rem */
+            font-weight: bold;
+            color: var(--color-primary);
+            text-align: center;
+            margin: 5px 0;
+            display: block;
+        }
+        
+        /* Texto descriptivo pequeño */
+        #grid-tarjetas p {
+            font-size: 0.75rem;
+            margin: 0;
+            color: #888;
+        }
+
+        /* --- FIN ESTILOS TARJETAS COMPACTAS --- */
+
+        /* Estilo del Mapa dentro del Modal */
+        .map-container {
+            width: 100%;
+            height: 400px;
+            background-color: #f0f0f0;
+            border-radius: var(--radius);
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            position: relative;
+        }
+        
+        /* Cursor de lupa para indicar zoom */
+        .map-container img {
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+        .map-container img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Mensaje si no carga la imagen */
+        .map-error {
+            text-align: center;
+            color: #d32f2f;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        .modal-body-content {
+            margin-bottom: 15px;
+        }
+        
+        /* Ajuste para que el número se vea grande en la tarjeta */
+        .card-number-big {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--color-primary);
+            text-align: center;
+            margin: 20px 0;
+            display: block;
+        }
+
+        /* Espacio para el botón de Maps */
+        .modal-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Tarjetas de Territorio</h1>
+        <p>Listado Completo (1-79)</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Botón Volver -->
+        <a href="index.html" class="back-link">
+            <span>⬅</span> Volver al Menú
+        </a>
+
+        <!-- Buscador rápido para encontrar la tarjeta 79 sin bajar tanto -->
+        <div class="search-container">
+            <input type="number" id="quickSearch" class="search-input" placeholder="🔢 Ir al número..." oninput="filtrarTarjetas()">
+        </div>
+
+        <!-- Aquí se generarán las 79 tarjetas automáticamente -->
+        <div id="grid-tarjetas" class="grid">
+            <!-- Las tarjetas se inyectan con JavaScript abajo -->
+        </div>
+
+    </div>
+
+    <!-- MODAL (Ventana Emergente) -->
+    <div id="modalTerritorio" class="modal-overlay">
+        <div class="modal">
+            <button class="close-btn" onclick="cerrarModal()">&times;</button>
+            
+            <h2 id="modalTitle" style="border-bottom: 2px solid var(--color-primary); padding-bottom: 10px;">Territorio</h2>
+            
+            <div class="modal-body-content">
+                <p><strong>Estado:</strong> <span id="modalStatus" class="badge disponible">Disponible</span></p>
+                <p>Toque la imagen para ampliarla.</p>
+            </div>
+
+            <!-- AQUÍ VA EL MAPA -->
+            <h3>🗺️ Mapa del Territorio</h3>
+            <div class="map-container" id="mapContainer">
+                <!-- El contenido del mapa se carga dinámicamente -->
+                <div class="map-placeholder">Cargando mapa...</div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN (Google Maps) -->
+            <div class="modal-actions">
+                <!-- El botón se inyecta dinámicamente para tener el ID correcto -->
+                <button id="btnGoogleMaps" class="btn btn-map">
+                    📍 Ver ubicación en Google Maps
+                </button>
+                
+                <button class="btn btn-primary" onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX (Imagen a pantalla completa) -->
+    <div id="lightboxOverlay" class="lightbox-overlay" onclick="cerrarLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImage" src="" alt="Imagen Ampliada">
+    </div>
+
+    <script>
+        // CONFIGURACIÓN: Cantidad de territorios
+        const CANTIDAD_TERRITORIOS = 79;
+
+        // BASE DE DATOS DE ENLACES DE GOOGLE MAPS
+        // Aquí debes pegar los links reales de tus territorios.
+        // Ejemplo: 1: "https://goo.gl/maps/xyz...", 
+        const LINKS_MAPS = {
+            1: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.291030%2C-66.330797&z=18",
+            2: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.291761%2C-66.334668&z=18",
+            3: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.292053%2C-66.339269&z=18",
+            4: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.289180%2C-66.341235&z=18",
+            5: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.288981%2C-66.338645&z=18",
+            6: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.289340%2C-66.333109&z=18",
+            7: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.288526%2C-66.332001&z=18",
+            8: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.288325%2C-66.336163&z=18",
+            9: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.285607%2C-66.331674&z=18",
+            10: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.286304%2C-66.334493&z=18",
+            11: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.285837%2C-66.339034&z=18",
+            12: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.285756%2C-66.341472&z=18",
+            13: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.284257%2C-66.339100&z=18",
+            14: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.283244%2C-66.341854&z=18",
+            15: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.282258%2C-66.339051&z=18",
+            16: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.283110%2C-66.336118&z=18",
+            17: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.283709%2C-66.332655&z=18",
+            18: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.282011%2C-66.332930&z=18",
+            19: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.280614%2C-66.332770&z=18",
+            20: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.281447%2C-66.336413&z=18",
+            21: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.279349%2C-66.334282&z=18",
+            22: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.280660%2C-66.341396&z=18",
+            23: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.278569%2C-66.339239&z=18",
+            24: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.278585%2C-66.340834&z=18",
+            25: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.278076%2C-66.343091&z=18",
+            26: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.276935%2C-66.340504&z=18",
+            27: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.275392%2C-66.340237&z=18",
+            28: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.276011%2C-66.343179&z=18",
+            29: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.273799%2C-66.340286&z=18",
+            30: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.273552%2C-66.343045&z=18",
+            31: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.272681%2C-66.337386&z=18",
+            32: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.272417%2C-66.333489&z=18",
+            33: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.271653%2C-66.335078&z=18",
+            34: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.268772%2C-66.333694&z=18",
+            35: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.270173%2C-66.337480&z=18",
+            36: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.271482%2C-66.340815&z=18",
+            37: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.271386%2C-66.342968&z=18",
+            38: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.270483%2C-66.341346&z=18",
+            39: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.268058%2C-66.338344&z=18",
+            40: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.267681%2C-66.336105&z=18",
+            41: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.268465%2C-66.334849&z=18",
+            42: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.267548%2C-66.333125&z=18",
+            43: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.266189%2C-66.334008&z=18",
+            44: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.266326%2C-66.337556&z=18",
+            45: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.265247%2C-66.335273&z=18",
+            46: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.264121%2C-66.337912&z=18",
+            47: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.260721%2C-66.351775&z=18",
+            48: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.264470%2C-66.350333&z=18",
+            49: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.264170%2C-66.347545&z=18",
+            50: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.263798%2C-66.345438&z=18",
+            51: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.267056%2C-66.345502&z=18",
+            52: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.266705%2C-66.347502&z=18",
+            53: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.266820%2C-66.349952&z=18",
+            54: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.269329%2C-66.347517&z=18",
+            55: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.269020%2C-66.345523&z=18",
+            56: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.271605%2C-66.347630&z=18",
+            57: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.271813%2C-66.345367&z=18",
+            58: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.281394%2C-66.345678&z=18",
+            59: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.283142%2C-66.347374&z=18",
+            60: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.284446%2C-66.346038&z=18",
+            61: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.283664%2C-66.344563&z=18",
+            62: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.285504%2C-66.347547&z=18",
+            63: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.284440%2C-66.350517&z=18",
+            64: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.283139%2C-66.350570&z=18",
+            65: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.285390%2C-66.354024&z=18",
+            66: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.284946%2C-66.352975&z=18",
+            67: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.285811%2C-66.349775&z=18",
+            68: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.287073%2C-66.348873&z=18",
+            69: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.287104%2C-66.350779&z=18",
+            70: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.288381%2C-66.350471&z=18",
+            71: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.287505%2C-66.352918&z=18",
+            72: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.286177%2C-66.354733&z=18",
+            73: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.288317%2C-66.354389&z=18",
+            74: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.288095%2C-66.347821&z=18",
+            75: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.287269%2C-66.346499&z=18",
+            76: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.286451%2C-66.345148&z=18",
+            77: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.286186%2C-66.343594&z=18",
+            78: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.253401%2C-66.365131&z=18",
+            79: "https://www.google.com/maps/d/viewer?mid=1d85zb6aRn2Ja0_od2EoIVkBDRW8MQUg&ll=-33.259123%2C-66.382641&z=18"
+        };
+        
+        // Referencias al DOM
+        const grid = document.getElementById('grid-tarjetas');
+        const modal = document.getElementById('modalTerritorio');
+        const modalTitle = document.getElementById('modalTitle');
+        const mapContainer = document.getElementById('mapContainer');
+        const btnGoogleMaps = document.getElementById('btnGoogleMaps');
+        
+        // Referencias Lightbox
+        const lightboxOverlay = document.getElementById('lightboxOverlay');
+        const lightboxImage = document.getElementById('lightboxImage');
+
+        // 1. FUNCIÓN PARA GENERAR LAS TARJETAS (Se ejecuta al cargar)
+        function generarTarjetas() {
+            grid.innerHTML = ''; // Limpiar
+
+            for (let i = 1; i <= CANTIDAD_TERRITORIOS; i++) {
+                const card = document.createElement('div');
+                card.className = 'card disponible'; // Por defecto disponibles
+                card.dataset.id = i; // Para el buscador
+                
+                // HTML de cada tarjeta
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="card-title">Territorio ${i}</span>
+                        <span class="badge disponible">Ver</span>
+                    </div>
+                    <div class="card-body" onclick="abrirModal(${i})">
+                        <span class="card-number-big">${i}</span>
+                        <p style="text-align:center; color:#666;">Tocar para ver mapa</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        // 2. FUNCIÓN PARA ABRIR EL MODAL
+        function abrirModal(numero) {
+            modalTitle.innerText = `Territorio Número ${numero}`;
+            
+            // Ruta de la imagen basada en tu carpeta
+            const rutaImagen = `mapas_territorios_HD/${numero}.png`;
+
+            // Insertamos la imagen con evento ONCLICK para el Lightbox
+            mapContainer.innerHTML = `
+                <img 
+                    src="${rutaImagen}" 
+                    alt="Mapa del Territorio ${numero}" 
+                    style="width: 100%; height: 100%; object-fit: contain;"
+                    onclick="abrirLightbox('${rutaImagen}')"
+                    onerror="mostrarError(this, '${numero}')"
+                    title="Clic para ampliar"
+                >
+            `;
+
+            // Configurar botón de Google Maps
+            btnGoogleMaps.onclick = function() {
+                abrirLinkMaps(numero);
+            };
+
+            modal.classList.add('active');
+        }
+
+        // Función auxiliar por si falla la carga de una imagen
+        function mostrarError(imgElement, numero) {
+            imgElement.style.display = 'none';
+            imgElement.onclick = null; // Quitar click si hay error
+            const errorMsg = document.createElement('div');
+            errorMsg.className = 'map-error';
+            errorMsg.innerHTML = `
+                ⚠️ No se pudo cargar el mapa.<br>
+                <small>Verifica que exista el archivo: <strong>mapas_territorio_HD/${numero}.png</strong></small>
+            `;
+            mapContainer.appendChild(errorMsg);
+        }
+
+        // 3. FUNCIÓN CERRAR MODAL
+        function cerrarModal() {
+            modal.classList.remove('active');
+            // Limpiamos el mapa para ahorrar recursos
+            setTimeout(() => { mapContainer.innerHTML = ''; }, 300);
+        }
+
+        // 4. FUNCIONES LIGHTBOX (ZOOM)
+        function abrirLightbox(src) {
+            lightboxImage.src = src;
+            lightboxOverlay.classList.add('active');
+        }
+
+        function cerrarLightbox() {
+            lightboxOverlay.classList.remove('active');
+            lightboxImage.src = "";
+        }
+
+        // 5. FUNCIÓN PARA ABRIR GOOGLE MAPS
+        function abrirLinkMaps(numero) {
+            const url = LINKS_MAPS[numero];
+            
+            if (url && url.length > 0) {
+                window.open(url, '_blank');
+            } else {
+                // Si no hay link configurado, intenta buscar por texto o avisa
+                // Opción A: Buscar en Google Maps genéricamente
+                const busqueda = `Territorio ${numero}`; 
+                // window.open(`https://www.google.com/maps/search/${busqueda}`, '_blank');
+                
+                // Opción B: Aviso (Preferible para evitar búsquedas erróneas)
+                alert(`No hay un enlace de GPS configurado para el Territorio ${numero} todavía.`);
+            }
+        }
+
+        // 6. FILTRO RÁPIDO
+        function filtrarTarjetas() {
+            const busqueda = document.getElementById('quickSearch').value;
+            const tarjetas = document.querySelectorAll('.card');
+
+            tarjetas.forEach(card => {
+                if (busqueda === "" || card.dataset.id == busqueda) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        // Ejecutar al inicio
+        generarTarjetas();
+
+        // Cerrar modal si clic fuera
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                cerrarModal();
+            }
+        }
+    </script>
+</body>
+</html>

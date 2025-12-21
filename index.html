@@ -3,99 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Territorios</title>
+    <title>Menú Principal - Territorios</title>
+    <!-- Referencia al archivo de estilos único -->
     <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* AJUSTES ESPECÍFICOS PARA EL MENÚ */
+        
+        /* 1. Aumentamos el ancho máximo para dar espacio a los 3 botones en línea */
+        .container-menu {
+            max-width: 1000px; 
+        }
+
+        /* 2. Grid Responsive Mejorado */
+        .grid-menu {
+            display: grid;
+            /* Lógica Responsive:
+               - repeat(auto-fit, ...): Pone tantas columnas como quepan.
+               - minmax(220px, 1fr): Cada tarjeta mide mínimo 220px. 
+                 Si la pantalla es ancha, caben 3. Si se achica, bajan automáticamente.
+            */
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
 
     <header>
-        <h1>Territorios</h1>
-        <p>Registro de Predicación</p>
+        <h1>Gestión de Territorios</h1>
+        <p>Seleccione una opción para comenzar</p>
     </header>
 
-    <div class="container">
-        <!-- Contenedor de Búsqueda y Filtros -->
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar por número, nombre o publicador..." oninput="filterTerritories()">
+    <!-- Usamos 'container' que ya existe y 'container-menu' para ajustes específicos -->
+    <div class="container container-menu">
+        <div class="grid-menu">
             
-            <select id="statusFilter" class="search-select" onchange="filterTerritories()">
-                <option value="">Todos los estados</option>
-                <option value="Disponible">🟢 Disponible</option>
-                <option value="Asignado">🔴 Asignado</option>
-                <option value="Completado">🔵 Completado</option>
-            </select>
+            <!-- Opción 1: Mapas -->
+            <a href="mapas.html" class="menu-card card-mapas" onclick="navegar('Mapas')">
+                <span class="menu-icon">🗺️</span>
+                <span class="menu-title">Mapas</span>
+                <span class="menu-desc">Ver y editar los mapas de la congregación.</span>
+            </a>
 
-            <button onclick="printS13()" class="btn btn-primary btn-print">
-                🖨️ S-13
-            </button>
-        </div>
+            <!-- Opción 2: Tarjetas de Territorio -->
+            <a href="tarjetas.html" class="menu-card card-tarjetas" onclick="navegar('Tarjeta de Territorios')">
+                <span class="menu-icon">📇</span>
+                <span class="menu-title">Tarjetas</span>
+                <span class="menu-desc">Asignar y gestionar tarjetas individuales.</span>
+            </a>
 
-        <!-- Grilla -->
-        <div id="grid" class="grid">
-            <div class="loading">Cargando territorios...</div>
-        </div>
-    </div>
+            <!-- Opción 3: Registro -->
+            <a href="app.html" class="menu-card card-registro" onclick="navegar('Registro S-13')">
+                <span class="menu-icon">📋</span>
+                <span class="menu-title">Registro</span>
+                <span class="menu-desc">Control general y formulario S-13.</span>
+            </a>
 
-    <!-- Modal Formulario -->
-    <div id="modalOverlay" class="modal-overlay">
-        <div class="modal">
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-            
-            <h2 id="modalTitle" style="margin-top:0;">Territorio 00</h2>
-            
-            <div class="media-preview" id="mediaPreview">
-                <!-- Imagen mapa -->
-            </div>
-            
-            <div id="mapLinkContainer" style="margin-bottom: 20px; text-align: center;">
-                <!-- Botón ir al mapa -->
-            </div>
-
-            <form id="territoryForm">
-                <input type="hidden" id="territoryId">
-
-                <div class="form-group">
-                    <label for="status">Estado actual:</label>
-                    <select id="status" onchange="toggleFields()">
-                        <option value="Disponible">Disponible (En estante)</option>
-                        <option value="Asignado">Asignado (En trabajo)</option>
-                        <option value="Completado">Completado</option>
-                    </select>
-                </div>
-
-                <div class="form-group" id="groupNotes">
-                    <label for="notes">Notas (Opcional):</label>
-                    <textarea id="notes" rows="3" placeholder="Si se completó, ¿quedó algo pendiente?"></textarea>
-                </div>
-
-                <div class="form-group" id="groupPublisher">
-                    <label for="publisher">Publicador:</label>
-                    <input type="text" id="publisher" placeholder="Ej: Hno. Pérez">
-                </div>
-
-                <div class="form-group">
-                    <label for="dateStart">Fecha Asignación (Inicio):</label>
-                    <input type="date" id="dateStart">
-                </div>
-
-                <div class="form-group">
-                    <label for="dateEnd">Fecha Completado (Fin):</label>
-                    <input type="date" id="dateEnd">
-                </div>
-
-                <!-- El campo de URL de Mapa ha sido eliminado de aquí -->
-
-                <button type="submit" class="btn btn-primary" id="saveBtn">Guardar Cambios</button>
-            </form>
         </div>
     </div>
 
-    <!-- Modal de Imagen Completa (Lightbox) -->
-    <div id="lightboxOverlay" class="lightbox-overlay" onclick="closeLightbox()">
-        <span class="lightbox-close">&times;</span>
-        <img id="lightboxImage" src="" alt="Imagen Completa">
-    </div>
+    <footer>
+        &copy; 2024 Gestión de Territorios
+    </footer>
 
-    <script src="app.js"></script>
+    <script>
+        function navegar(seccion) {
+            console.log("Navegando a: " + seccion);
+            // Aquí puedes agregar lógica adicional si es necesario
+        }
+    </script>
+
 </body>
 </html>

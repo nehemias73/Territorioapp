@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapas - Gestión de Territorios</title>
+    <!-- Referencia al archivo de estilos único -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        /* AJUSTES ESPECÍFICOS PARA ESTA PÁGINA */
+        
+        .container-menu {
+            max-width: 800px; /* Ancho controlado para que las 2 tarjetas se vean centradas */
+        }
+
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
+
+        /* Colores específicos para Mapas */
+        .card-digital { border-top-color: #2196F3; } /* Azul para Digital */
+        .card-pdf { border-top-color: #E53935; }     /* Rojo para PDF */
+
+        /* Botón simple para volver atrás */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .back-link:hover { color: var(--color-primary); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mapas de la Congregación</h1>
+        <p>Seleccione el formato del mapa</p>
+    </header>
+
+    <div class="container container-menu">
+        
+        <!-- Enlace para volver al menú principal -->
+        <a href="index.html" class="back-link">
+            <span>⬅</span> Volver al Menú Principal
+        </a>
+
+        <div class="grid-menu">
+            
+            <!-- Opción 1: Mapa Digital -->
+            <a href="https://goo.gl/maps/rtVi8bsL7YYkET2S8?g_st=ac" class="menu-card card-digital" onclick="abrirMapaDigital()">
+                <span class="menu-icon">🌐</span>
+                <span class="menu-title">Mapa Digital</span>
+                <span class="menu-desc">Acceder al mapa interactivo en línea (Google Maps).</span>
+            </a>
+
+            <!-- Opción 2: Mapa PDF -->
+            <a href="mapa/Mapa Norte San Luis.pdf" class="menu-card card-pdf" onclick="descargarPDF()">
+                <span class="menu-icon">📄</span>
+                <span class="menu-title">Mapa PDF</span>
+                <span class="menu-desc">Descargar o visualizar el mapa en formato PDF.</span>
+            </a>
+
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Gestión de Territorios
+    </footer>
+
+    <script>
+        function abrirMapaDigital() {
+            // Aquí puedes poner el enlace real a Google Maps
+            console.log("Abriendo Mapa Digital...");
+            // window.open('https://maps.google.com/...', '_blank');
+        }
+
+        function descargarPDF() {
+            // Aquí puedes poner la lógica para descargar el PDF
+            console.log("Descargando PDF...");
+            // window.location.href = 'ruta/al/mapa.pdf';
+        }
+    </script>
+
+</body>
+</html>

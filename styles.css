@@ -11,6 +11,12 @@
     --color-info: #2196F3;
     
     --color-map: #EA4335;
+
+    /* COLORES ESPECÍFICOS DEL MENÚ */
+    --color-menu-mapas: #4CAF50;    /* Verde */
+    --color-menu-tarjetas: #FF9800; /* Naranja */
+    --color-menu-registro: #2196F3; /* Azul */
+
     --radius: 8px;
     --shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -21,6 +27,10 @@ body {
     color: var(--color-text);
     margin: 0;
     padding: 0;
+    /* Asegura que el footer se vaya al fondo si hay poco contenido */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header {
@@ -38,6 +48,9 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     max-width: 1000px;
     margin: 20px auto;
     padding: 0 15px;
+    flex-grow: 1; /* Permite que el contenido crezca para empujar el footer */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Barra de Herramientas */
@@ -83,7 +96,7 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     gap: 20px;
 }
 
-/* Tarjeta */
+/* Tarjeta (App Principal) */
 .card {
     background: var(--color-card);
     border-radius: var(--radius);
@@ -221,3 +234,88 @@ textarea { resize: vertical; }
 .btn-map:hover { background-color: #fff5f5; }
 
 .loading { text-align: center; padding: 40px; font-size: 1.2rem; color: #666; }
+
+/* ==========================================
+   ESTILOS NUEVOS: MENÚ PRINCIPAL
+   ========================================== */
+
+/* Contenedor específico para centrar el menú verticalmente si se desea */
+.container-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 800px; /* Un poco más estrecho para estética del menú */
+}
+
+.grid-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    width: 100%;
+}
+
+.menu-card {
+    background: var(--color-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-top: 6px solid var(--color-primary);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+}
+
+.menu-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.menu-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.menu-desc {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Colores específicos por tarjeta de menú */
+.card-mapas { border-top-color: var(--color-menu-mapas); }
+.card-tarjetas { border-top-color: var(--color-menu-tarjetas); }
+.card-registro { border-top-color: var(--color-menu-registro); }
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+    font-size: 0.8rem;
+    background-color: transparent;
+    margin-top: auto; /* Empuja el footer al final */
+}
+
+@media (max-width: 600px) {
+    .grid-menu {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
