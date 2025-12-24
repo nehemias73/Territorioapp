@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salidas de Predicación</title>
+    <!-- Librería para exportar a Excel local -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        /* --- ESTILOS ORIGINALES (styles.css) --- */
+        :root {
+            --color-primary: #4A6DA7;
+            --color-bg: #F4F6F8;
+            --color-card: #FFFFFF;
+            --color-text: #333333;
+            --color-success: #4CAF50;
+            --color-assigned: #D32F2F;
+            --color-info: #2196F3;
+            --color-map: #EA4335;
+            
+            /* Nuevos colores para el diseño moderno */
+            --color-weekend: #E67E22;
+            --color-input-bg: #f3f6f9;
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--color-primary), #2c4a7c);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        header h1 { margin: 0; font-size: 1.8rem; font-weight: 600; letter-spacing: 0.5px; }
+        header p { margin: 5px 0 0; opacity: 0.9; font-size: 1rem; font-weight: 300; }
+
+        /* Botón de configuración en el header */
+        .config-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .config-btn:hover { background: rgba(255,255,255,0.4); }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+            flex-grow: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--color-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        /* Botones modernos */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            color: white;
+            background-color: var(--color-primary);
+            box-shadow: 0 4px 6px rgba(74, 109, 167, 0.3);
+        }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(74, 109, 167, 0.4); }
+        
+        .btn-print { background-color: var(--color-success); }
+        .btn-print:hover { background-color: #43A047; }
+
+        .btn-secondary {
+            background-color: #fff;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+            box-shadow: none;
+        }
+        .btn-secondary:hover { background-color: #f0f4f8; transform: translateY(-2px); }
+
+        /* Botón NUBE (Google Sheets) */
+        .btn-cloud {
+            background-color: #4285F4; /* Azul Google */
+            color: white;
+        }
+        .btn-cloud:hover {
+            background-color: #3367D6;
+            box-shadow: 0 6px 12px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn-danger {
+            background-color: #ff5252;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        .btn-danger:hover { background-color: #d32f2f; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .back-link:hover { color: var(--color-primary); }
+
+        /* --- TABLA --- */
+        .schedule-title {
+            text-align: center;
+            color: var(--color-primary);
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        .schedule-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background-color: var(--color-primary);
+            border-radius: 2px;
+        }
+        
+        /* Contenedor de fechas */
+        .date-container {
+            margin-bottom: 25px; 
+            display: flex; 
+            gap: 15px; 
+            align-items: center; 
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .date-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .date-picker {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: var(--color-input-bg);
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+        }
+
+        /* Etiqueta de texto combinada (para imprimir) */
+        #week-display {
+            display: none; /* Oculto en pantalla normal */
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 10px;
+        }
+
+        .schedule-table th {
+            padding: 12px;
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            font-weight: 600;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .schedule-table th.center-text { text-align: center; }
+        .col-control-cell {
+            text-align: center;
+            vertical-align: middle;
+            width: 50px;
+        }
+
+        .row-entry td {
+            background: white;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            padding: 10px 8px;
+            vertical-align: middle;
+            transition: background 0.2s;
+        }
+        .row-entry td:first-child {
+            border-left: 1px solid #eee;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        .row-entry td:last-child {
+            border-right: 1px solid #eee;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+        .row-entry:hover td { background-color: #fafafa; }
+
+        .cell-input {
+            width: 100%;
+            border: 1px solid transparent;
+            background-color: var(--color-input-bg);
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            box-sizing: border-box;
+            color: #333;
+            transition: all 0.2s;
+        }
+        .cell-input:focus {
+            background-color: white;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(74, 109, 167, 0.1);
+            outline: none;
+        }
+        .cell-input.group-input {
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+        .cell-input.group-input:hover { background-color: #e3f2fd; }
+
+        .cell-input.day-name {
+            background: transparent;
+            font-weight: 700;
+            color: var(--color-primary);
+            padding-left: 5px;
+        }
+        .weekend-row .cell-input.day-name { color: var(--color-weekend); }
+
+        .group-header {
+            background-color: var(--color-primary);
+            color: white;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            width: 100%;
+            display: block; 
+            box-sizing: border-box;
+        }
+        .group-header-weekend { background-color: var(--color-weekend) !important; }
+
+        .spacer-row td {
+            background: transparent !important;
+            border: none !important;
+            padding: 5px !important;
+        }
+
+        tr.row-disabled td {
+            opacity: 0.4;
+            background-color: #f8f9fa;
+        }
+        tr.row-disabled .cell-input {
+            background-color: transparent;
+            cursor: not-allowed;
+        }
+
+        .row-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .row-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: var(--color-success); }
+        
+        .btn-circle {
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .btn-circle:hover { transform: scale(1.1); }
+        .btn-add-row { background-color: var(--color-info); }
+        .btn-delete-row { background-color: #ff5252; }
+
+        /* Panel Historial */
+        .history-panel {
+            background-color: #fff;
+            border: 2px dashed #ddd;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 40px;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .history-table th, .history-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .history-table th { color: var(--color-primary); }
+
+        /* MODALES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        .modal-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: popIn 0.2s ease-out;
+            position: relative;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-title { margin: 0 0 20px 0; color: var(--color-primary); font-size: 1.2rem; }
+        
+        /* Grid del selector de grupos */
+        .group-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .btn-group-option {
+            background-color: #f0f4f8;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        /* Estilos para estado seleccionado */
+        .btn-group-option.selected {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 8px rgba(74, 109, 167, 0.3);
+        }
+
+        .btn-group-option:hover { transform: scale(1.05); }
+
+        .btn-group-all { grid-column: span 3; background-color: #e8f5e9; color: #2e7d32; }
+        
+        /* Estado seleccionado para 'Todos' */
+        .btn-group-all.selected {
+            background-color: #2e7d32 !important; /* Forzar verde oscuro */
+            color: white !important;
+        }
+        
+        .btn-group-all:hover { background-color: #2e7d32; color: white; }
+
+        .btn-modal-close {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 10px;
+        }
+        
+        /* Botón Listo en Modal */
+        .btn-modal-confirm {
+            background-color: var(--color-success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+        }
+        .btn-modal-confirm:hover { background-color: #43A047; }
+        
+        /* Input para la URL del script */
+        .script-url-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        footer { text-align: center; padding: 20px; color: #888; font-size: 0.8rem; margin-top: auto; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container { padding: 10px; margin: 10px auto; }
+            .card { padding: 15px; }
+            .schedule-table thead { display: none; }
+            .schedule-table, .schedule-table tbody, .schedule-table tr, .schedule-table td {
+                display: block; width: 100%; box-sizing: border-box;
+            }
+            .spacer-row {
+                display: block !important; margin-top: 25px; margin-bottom: 10px;
+                background: transparent !important; border: none !important; box-shadow: none !important;
+            }
+            .spacer-row td { display: block !important; padding: 0 !important; border: none !important; background: transparent !important; }
+            .spacer-row td:first-child { display: none !important; }
+            .spacer-row td:last-child { width: 100% !important; }
+
+            .row-entry {
+                background: #fff; margin-bottom: 15px; border: 1px solid #ddd;
+                border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 10px;
+            }
+            .row-entry td {
+                border: none !important; border-radius: 0 !important;
+                display: flex; justify-content: space-between; align-items: center;
+                padding: 8px 0; text-align: right;
+            }
+            .row-entry td::before {
+                content: attr(data-label); font-weight: 600; color: var(--color-primary);
+                font-size: 0.9rem; margin-right: 15px; text-align: left; flex-shrink: 0;
+            }
+            .cell-input { text-align: right; }
+            .cell-input.group-input { text-align: right; }
+
+            .col-control-cell {
+                display: flex !important; justify-content: space-between !important;
+                background-color: #f8f9fa; padding: 10px !important; border-radius: 8px; margin-bottom: 10px;
+            }
+            .col-control-cell::before { content: "Opciones:"; color: #555; }
+        }
+
+        /* --- ESTILOS DE IMPRESIÓN (MEJORADOS PARA A4) --- */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 1cm;
+            }
+
+            /* Ocultar elementos de UI */
+            header, footer, .btn, .back-link, .no-print, .col-control, 
+            .history-panel, .modal-overlay, .config-btn, .row-controls, 
+            .col-control-cell, .date-container { /* Ocultamos los selectores de fecha */
+                display: none !important;
+            }
+
+            body {
+                background-color: white;
+                color: black;
+                font-size: 11pt; /* Letra legible */
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                background: white;
+            }
+
+            /* Título del reporte */
+            .schedule-title {
+                color: black;
+                font-size: 18pt;
+                margin-bottom: 5px;
+                text-align: center;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+            }
+            
+            /* Input de Semana (Versión Texto para Imprimir) */
+            #week-display {
+                display: block !important;
+                font-size: 14pt;
+                font-weight: bold;
+                text-align: center;
+                border: none;
+                border-bottom: 1px dashed #666;
+                width: 100%;
+                color: black;
+                margin-bottom: 10px;
+                padding: 5px;
+            }
+
+            /* Tabla Estricta para Impresión (Grid con bordes) */
+            .schedule-table {
+                width: 100%;
+                /* CRUCIAL: Layout fijo para que obedezca los anchos exactos */
+                table-layout: fixed;
+                border-collapse: collapse;
+                margin-top: 10px;
+                display: table !important;
+            }
+
+            .schedule-table thead { display: table-header-group !important; }
+            .schedule-table tbody { display: table-row-group !important; }
+            .schedule-table tr { 
+                display: table-row !important; 
+                page-break-inside: avoid;
+            }
+
+            /* REGLA CRÍTICA: Ocultar la primera columna (Control) en TODAS las filas
+               incluyendo cabecera, cuerpo y filas espaciadoras */
+            .col-control, 
+            .col-control-cell,
+            .schedule-table th:first-child,
+            .schedule-table td:first-child { 
+                display: none !important;
+                width: 0 !important;
+            }
+
+            .schedule-table td, .schedule-table th {
+                display: table-cell !important;
+                border: 1px solid #000; /* BORDES NEGROS VISIBLES */
+                padding: 6px;
+                text-align: left;
+                vertical-align: middle;
+                font-size: 10pt;
+                color: black !important;
+                background: white !important;
+                overflow: hidden; /* Evitar desbordes */
+            }
+
+            /* ANCHOS EXACTOS PARA LAS 6 COLUMNAS VISIBLES (Total 100%)
+               Nota: Al ocultar el primer hijo, los índices se mantienen en CSS basados en el DOM original,
+               pero visualmente se recorren. Sin embargo, al usar display:none en el :first-child,
+               podemos apuntar a los siguientes.
+               
+               Indices originales (1: Control, 2: Día, 3: Hora, 4: Punto, 5: Grupo, 6: Territorio, 7: Conductor)
+            */
+            
+            /* Día */
+            .schedule-table th:nth-child(2), .schedule-table td:nth-child(2) { width: 10%; } 
+            
+            /* Hora */
+            .schedule-table th:nth-child(3), .schedule-table td:nth-child(3) { width: 8%; } 
+            
+            /* Punto de Encuentro (AUMENTADO) */
+            .schedule-table th:nth-child(4), .schedule-table td:nth-child(4) { width: 27%; } 
+            
+            /* Grupo */
+            .schedule-table th:nth-child(5), .schedule-table td:nth-child(5) { width: 8%; text-align: center; } 
+            
+            /* Territorio */
+            .schedule-table th:nth-child(6), .schedule-table td:nth-child(6) { width: 20%; } 
+            
+            /* Conductor (AUMENTADO) */
+            .schedule-table th:nth-child(7), .schedule-table td:nth-child(7) { width: 27%; } 
+            
+            /* Centrar cabeceras */
+            .schedule-table th {
+                text-align: center;
+                background-color: #f0f0f0 !important;
+                font-weight: bold;
+            }
+
+            /* Inputs dentro de la tabla */
+            .cell-input {
+                border: none;
+                background: transparent;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                font-size: inherit;
+                color: black;
+                font-family: inherit;
+            }
+            
+            /* Encabezados de Grupo (Lunes-Viernes) */
+            .group-header {
+                background-color: #e0e0e0 !important;
+                color: black !important;
+                font-weight: bold;
+                border: 1px solid #000;
+                text-transform: uppercase;
+                font-size: 10pt;
+                margin: 0;
+                padding: 4px;
+                text-align: center;
+                display: block;
+                width: 100%;
+            }
+            
+            .group-header-weekend {
+                background-color: #ccc !important;
+            }
+
+            .spacer-row { display: table-row !important; }
+            .spacer-row td { 
+                border: none !important; 
+                padding: 15px 0 0 0 !important; /* Espacio antes del encabezado */
+            }
+            
+            /* Notas */
+            textarea.cell-input {
+                border: 1px solid #000;
+                min-height: 80px;
+                padding: 5px;
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            /* Ocultar elementos móviles */
+            .row-entry td::before { content: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gestión de Territorios</h1>
+        <p>Generador de Programa de Predicación</p>
+        <button class="config-btn" onclick="openConfigModal()" title="Configuración de Nube">⚙️</button>
+    </header>
+
+    <div class="container">
+        <!-- Navegación -->
+        <div class="no-print">
+            <a href="index.html" class="back-link">← Volver al Menú</a>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0; color: #333; font-weight: 600;">Programa Semanal</h2>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <!-- Botón NUBE -->
+                    <button onclick="uploadToCloud()" class="btn btn-cloud" title="Envía los datos directamente a tu Google Sheet">☁️ Guardar en Nube</button>
+                    
+                    <button onclick="saveWeekToHistory()" class="btn btn-secondary" title="Guarda esta semana en el historial del navegador">💾 Local</button>
+                    <button onclick="window.print()" class="btn btn-print">🖨️ PDF</button>
+                </div>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 25px;">
+                Rellena los datos. Configura tu URL en ⚙️ para usar el botón "Guardar en Nube".
+            </p>
+        </div>
+
+        <!-- Tarjeta Principal del Formulario -->
+        <div class="card">
+            
+            <h2 class="schedule-title">Salidas para el Servicio del Campo</h2>
+
+            <!-- Selector de FECHAS (Visible en pantalla) -->
+            <div class="date-container">
+                <div class="date-input-group">
+                    <label style="font-weight: bold; color: #555;">Desde:</label>
+                    <input type="date" id="date-start" class="date-picker" onchange="updateWeekLabel()">
+                </div>
+                <div class="date-input-group">
+                    <label style="font-weight: bold; color: #555;">Hasta:</label>
+                    <input type="date" id="date-end" class="date-picker" onchange="updateWeekLabel()">
+                </div>
+            </div>
+
+            <!-- Etiqueta de Semana (Visible SOLO al imprimir o guardar) -->
+            <div id="week-display">Semana Sin Fecha</div>
+
+            <table class="schedule-table" id="table-body">
+                <thead>
+                    <tr>
+                        <th class="col-control no-print center-text" style="width: 50px; font-size: 1.2rem;">📅</th>
+                        <th style="width: 12%;">Día</th>
+                        <th style="width: 10%;">Hora</th>
+                        <th style="width: 23%;">Punto de Encuentro</th>
+                        <th style="width: 8%; text-align: center;">Grupo</th>
+                        <th style="width: 20%;">Territorio</th>
+                        <th style="width: 22%;">Conductor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- LUNES A VIERNES -->
+                    <tr class="spacer-row">
+                        <td class="col-control no-print"></td>
+                        <td colspan="6"><div class="group-header">LUNES A VIERNES</div></td>
+                    </tr>
+                    
+                    <!-- Lunes -->
+                    <tr class="row-entry">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Lunes"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+                    <!-- Martes -->
+                    <tr class="row-entry">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Martes"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+                    <!-- Miercoles -->
+                    <tr class="row-entry">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Miércoles"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+                    <!-- Jueves -->
+                    <tr class="row-entry">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Jueves"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+                    <!-- Viernes -->
+                    <tr class="row-entry">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Viernes"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+
+                    <!-- SÁBADOS -->
+                    <tr class="spacer-row">
+                        <td class="col-control no-print"></td>
+                        <td colspan="6"><div class="group-header group-header-weekend">SÁBADOS</div></td>
+                    </tr>
+                    <tr class="row-entry weekend-row">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Sábado"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+
+                    <!-- DOMINGOS -->
+                    <tr class="spacer-row">
+                        <td class="col-control no-print"></td>
+                        <td colspan="6"><div class="group-header group-header-weekend">DOMINGOS</div></td>
+                    </tr>
+                    <tr class="row-entry weekend-row">
+                        <td class="col-control-cell no-print">
+                            <div class="row-controls">
+                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
+                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
+                            </div>
+                        </td>
+                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Domingo"></td>
+                        <td data-label="Hora"><input type="text" class="cell-input" value="9:30 AM"></td>
+                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
+                        <td data-label="Grupo"><input type="text" class="cell-input group-input" placeholder="-" readonly onclick="openGroupSelector(this)"></td>
+                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
+                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Notas adicionales -->
+            <div style="margin-top: 30px;">
+                <label style="font-weight: bold; font-size: 0.9rem; color: var(--color-primary); display: block; margin-bottom: 8px;">NOTAS / ANUNCIOS:</label>
+                <textarea class="cell-input" rows="3" style="border: 2px solid #eee; resize: vertical;" placeholder="Escribe aquí cualquier nota adicional para la semana..."></textarea>
+            </div>
+
+        </div>
+
+        <!-- PANEL DE HISTORIAL (Oculto al imprimir) -->
+        <div class="history-panel no-print">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: #333;">🗂️ Historial Local</h3>
+                <button onclick="exportHistoryToExcel()" class="btn" style="background-color: #2e7d32;">📊 Excel Local</button>
+            </div>
+            <p style="font-size: 0.85rem; color: #666;">
+                Estos datos se guardan solo en tu navegador.
+            </p>
+            <table class="history-table">
+                <thead><tr><th>Semana</th><th>Registros</th><th>Acción</th></tr></thead>
+                <tbody id="history-list"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- MODAL GRUPO -->
+    <div id="group-modal" class="modal-overlay" style="display: none;" onclick="closeGroupModalOutside(event)">
+        <div class="modal-card">
+            <h3 class="modal-title">Seleccionar Grupos</h3>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Selecciona uno o varios</p>
+            
+            <div class="group-grid">
+                <!-- Se generan dinámicamente con JS, pero los dejamos aquí para referencia visual si falla JS -->
+                <button class="btn-group-option" data-value="1" onclick="toggleGroup('1')">1</button>
+                <button class="btn-group-option" data-value="2" onclick="toggleGroup('2')">2</button>
+                <button class="btn-group-option" data-value="3" onclick="toggleGroup('3')">3</button>
+                <button class="btn-group-option" data-value="4" onclick="toggleGroup('4')">4</button>
+                <button class="btn-group-option" data-value="5" onclick="toggleGroup('5')">5</button>
+                <button class="btn-group-option" onclick="toggleGroup('')" style="color: #999;">Borrar</button>
+                <button class="btn-group-option btn-group-all" data-value="Todos" onclick="toggleGroup('Todos')">Todos</button>
+            </div>
+            
+            <button class="btn-modal-confirm" onclick="confirmSelection()">✅ Listo</button>
+            <button class="btn-modal-close" onclick="closeGroupModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIGURACIÓN -->
+    <div id="config-modal" class="modal-overlay" style="display: none;" onclick="closeConfigModalOutside(event)">
+        <div class="modal-card">
+            <h3 class="modal-title">⚙️ Configurar Nube</h3>
+            <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">
+                Pega aquí la URL de tu Web App de Google Apps Script.
+            </p>
+            <input type="text" id="script-url" class="script-url-input" placeholder="https://script.google.com/macros/s/...">
+            <button class="btn" onclick="saveConfig()" style="width:100%;">Guardar URL</button>
+            <button class="btn-modal-close" onclick="closeConfigModal()" style="margin-top:10px;">Cerrar</button>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Gestión de Territorios - Salidas
+    </footer>
+
+    <script>
+        // --- 1. CONFIGURACIÓN Y CONEXIÓN CON SHEETS ---
+        function openConfigModal() {
+            document.getElementById('config-modal').style.display = 'flex';
+            document.getElementById('script-url').value = localStorage.getItem('googleScriptUrl') || '';
+        }
+        function closeConfigModal() { document.getElementById('config-modal').style.display = 'none'; }
+        function closeConfigModalOutside(e) { if(e.target.id === 'config-modal') closeConfigModal(); }
+
+        function saveConfig() {
+            const url = document.getElementById('script-url').value.trim();
+            if(url) {
+                localStorage.setItem('googleScriptUrl', url);
+                alert("✅ URL guardada correctamente.");
+                closeConfigModal();
+            } else {
+                alert("Por favor ingresa una URL válida.");
+            }
+        }
+
+        // --- MANEJO DE FECHAS (Nuevo) ---
+        function formatDate(dateStr) {
+            if (!dateStr) return "";
+            const [year, month, day] = dateStr.split('-');
+            const months = [
+                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+            ];
+            // +0 para quitar ceros a la izquierda del día si quieres, pero string está bien
+            return `${parseInt(day)} de ${months[parseInt(month) - 1]}`;
+        }
+
+        function updateWeekLabel() {
+            const start = document.getElementById('date-start').value;
+            const end = document.getElementById('date-end').value;
+            const label = document.getElementById('week-display');
+
+            if (start && end) {
+                // Ejemplo: "24 al 30 de Diciembre" o "28 de Noviembre al 4 de Diciembre"
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                
+                const startDay = startDate.getDate() + 1; // Ajuste por zona horaria simple
+                const endDay = endDate.getDate() + 1;
+                
+                // Extraer mes/año de los inputs (strings) para evitar lios de zona horaria
+                const [sY, sM, sD] = start.split('-');
+                const [eY, eM, eD] = end.split('-');
+                
+                const months = [
+                    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                ];
+                
+                let text = "";
+                if (sM === eM) {
+                    // Mismo mes: "24 al 30 de Diciembre"
+                    text = `SEMANA DEL: ${parseInt(sD)} al ${parseInt(eD)} de ${months[parseInt(sM)-1]}`;
+                } else {
+                    // Mes diferente: "28 de Noviembre al 4 de Diciembre"
+                    text = `SEMANA DEL: ${parseInt(sD)} de ${months[parseInt(sM)-1]} al ${parseInt(eD)} de ${months[parseInt(eM)-1]}`;
+                }
+                
+                label.innerText = text;
+            } else {
+                label.innerText = "SEMANA SIN FECHA";
+            }
+        }
+
+        function uploadToCloud() {
+            const url = localStorage.getItem('googleScriptUrl');
+            if(!url) {
+                alert("⚠️ Primero debes configurar la URL de tu script.\nToca el ícono de engranaje (⚙️) arriba a la derecha.");
+                openConfigModal();
+                return;
+            }
+
+            const rows = document.querySelectorAll('.row-entry:not(.row-disabled)');
+            if(rows.length === 0) { alert("No hay datos para guardar."); return; }
+
+            // Usar el texto generado por las fechas
+            const weekTitle = document.getElementById('week-display').innerText.replace("SEMANA DEL: ", "") || 'Semana Sin Fecha';
+            const payload = [];
+
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('.cell-input');
+                payload.push({
+                    semana: weekTitle,
+                    dia: inputs[0].value,
+                    hora: inputs[1].value,
+                    lugar: inputs[2].value,
+                    grupo: inputs[3].value,
+                    territorio: inputs[4].value,
+                    conductor: inputs[5].value
+                });
+            });
+
+            const btn = document.querySelector('.btn-cloud');
+            const originalText = btn.innerText;
+            btn.innerText = "⏳ Enviando...";
+            btn.disabled = true;
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("✅ ¡Datos enviados a Google Sheets!");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            })
+            .catch(err => {
+                console.error(err);
+                alert("❌ Error al conectar. Verifica tu URL y tu internet.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+        }
+
+
+        // --- 2. FUNCIONES DE TABLA E INTERFAZ ---
+        function attachInputListeners(row) {
+            const inputs = row.querySelectorAll('.cell-input');
+            inputs.forEach(input => {
+                if (!input.classList.contains('group-input')) {
+                    input.addEventListener('input', function() {
+                        this.setAttribute('value', this.value);
+                        if(this.tagName === 'TEXTAREA') this.innerHTML = this.value;
+                    });
+                }
+            });
+        }
+        document.querySelectorAll('tr').forEach(attachInputListeners);
+
+        function toggleRow(checkbox) {
+            const row = checkbox.closest('tr');
+            if (checkbox.checked) {
+                row.classList.remove('row-disabled');
+                row.querySelectorAll('.cell-input').forEach(input => input.disabled = false);
+            } else {
+                row.classList.add('row-disabled');
+                row.querySelectorAll('.cell-input').forEach(input => input.disabled = true);
+            }
+        }
+
+        function addRow(btn) {
+            const currentRow = btn.closest('tr');
+            const newRow = currentRow.cloneNode(true);
+            const inputs = newRow.querySelectorAll('.cell-input');
+            inputs.forEach((input, index) => {
+                if (index > 0) { input.value = ""; input.setAttribute('value', ""); }
+                if (index === 1) input.placeholder = "Hora...";
+                input.disabled = false;
+            });
+            const controlDiv = newRow.querySelector('.row-controls');
+            controlDiv.innerHTML = ''; 
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-circle btn-delete-row';
+            deleteBtn.innerText = '✕';
+            deleteBtn.title = "Eliminar";
+            deleteBtn.onclick = function() { newRow.remove(); };
+            const newCheckbox = document.createElement('input');
+            newCheckbox.type = 'checkbox';
+            newCheckbox.className = 'row-checkbox';
+            newCheckbox.checked = true;
+            newCheckbox.onchange = function() { toggleRow(this); };
+            controlDiv.appendChild(newCheckbox);
+            controlDiv.appendChild(deleteBtn);
+            newRow.classList.remove('row-disabled');
+            currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+            attachInputListeners(newRow);
+        }
+
+        // --- 3. MODAL DE GRUPOS (LÓGICA MEJORADA DE MULTISELECCIÓN) ---
+        let currentGroupInput = null;
+        let selectedGroups = new Set(); // Usamos Set para manejar únicos
+
+        function openGroupSelector(inputElement) {
+            if (inputElement.disabled) return; 
+            currentGroupInput = inputElement;
+            
+            // 1. Leer el valor actual del input para pre-seleccionar
+            const currentVal = inputElement.value;
+            selectedGroups.clear();
+            
+            if (currentVal && currentVal !== '-') {
+                // Separar por comas si hay varios
+                const parts = currentVal.split(',').map(s => s.trim());
+                parts.forEach(p => selectedGroups.add(p));
+            }
+            
+            updateModalVisuals();
+            document.getElementById('group-modal').style.display = 'flex';
+        }
+
+        function closeGroupModal() {
+            document.getElementById('group-modal').style.display = 'none';
+            currentGroupInput = null;
+        }
+        
+        function closeGroupModalOutside(e) { if (e.target.id === 'group-modal') closeGroupModal(); }
+
+        function toggleGroup(val) {
+            // Caso 1: Borrar todo
+            if (val === '') {
+                selectedGroups.clear();
+            } 
+            // Caso 2: Se seleccionó "Todos"
+            else if (val === 'Todos') {
+                if (selectedGroups.has('Todos')) {
+                    selectedGroups.delete('Todos'); // Si ya estaba, lo quita
+                } else {
+                    selectedGroups.clear(); // Limpia otros números
+                    selectedGroups.add('Todos'); // Pone solo Todos
+                }
+            } 
+            // Caso 3: Se seleccionó un número (1-5)
+            else {
+                // Si "Todos" estaba marcado, lo quitamos porque ahora es específico
+                if (selectedGroups.has('Todos')) {
+                    selectedGroups.delete('Todos');
+                }
+
+                if (selectedGroups.has(val)) {
+                    selectedGroups.delete(val);
+                } else {
+                    selectedGroups.add(val);
+                }
+            }
+            
+            updateModalVisuals();
+        }
+
+        function updateModalVisuals() {
+            const buttons = document.querySelectorAll('.btn-group-option');
+            buttons.forEach(btn => {
+                const val = btn.getAttribute('data-value');
+                // Si el botón tiene valor (ignorar el de borrar que no tiene data-value o es vacio)
+                if (val) {
+                    if (selectedGroups.has(val)) {
+                        btn.classList.add('selected');
+                    } else {
+                        btn.classList.remove('selected');
+                    }
+                }
+            });
+        }
+
+        function confirmSelection() {
+            if (currentGroupInput) {
+                // Convertir Set a Array, ordenar y unir
+                let finalVal = Array.from(selectedGroups).sort().join(', ');
+                
+                // Si está vacío, volvemos al guión por defecto o vacío
+                if (!finalVal) finalVal = ''; 
+                
+                currentGroupInput.value = finalVal;
+                currentGroupInput.setAttribute('value', finalVal); 
+            }
+            closeGroupModal();
+        }
+
+        // --- 4. HISTORIAL LOCAL ---
+        const STORAGE_KEY = 'predicacion_historial';
+        function getHistory() { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : []; }
+        function saveHistory(history) { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); renderHistory(); }
+        
+        function saveWeekToHistory() {
+            // Usar el texto generado por las fechas
+            const weekTitle = document.getElementById('week-display').innerText.replace("SEMANA DEL: ", "") || 'Semana Sin Fecha';
+            const rows = document.querySelectorAll('.row-entry:not(.row-disabled)');
+            if(rows.length === 0) { alert("No hay salidas activas."); return; }
+            const weekData = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('.cell-input');
+                weekData.push({
+                    Semana: weekTitle, Dia: inputs[0].value, Hora: inputs[1].value,
+                    Lugar: inputs[2].value, Grupo: inputs[3].value,
+                    Territorio: inputs[4].value, Conductor: inputs[5].value
+                });
+            });
+            if(!confirm(`¿Guardar localmente?`)) return;
+            const history = getHistory();
+            history.push({ id: Date.now(), title: weekTitle, date: new Date().toLocaleDateString(), records: weekData });
+            saveHistory(history);
+            alert("✅ Guardado localmente.");
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            const history = getHistory();
+            if(history.length === 0) { list.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">Vacío.</td></tr>'; return; }
+            history.reverse().forEach((item) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${item.title}</strong><br><span style="font-size:0.8em; color:#888;">${item.date}</span></td>
+                    <td>${item.records.length}</td>
+                    <td><button class="btn btn-danger" onclick="deleteHistoryItem(${item.id})">Borrar</button></td>
+                `;
+                list.appendChild(tr);
+            });
+        }
+        function deleteHistoryItem(id) {
+            if(!confirm("¿Borrar?")) return;
+            let history = getHistory();
+            history = history.filter(item => item.id !== id);
+            saveHistory(history);
+        }
+        function exportHistoryToExcel() {
+            const history = getHistory();
+            if(history.length === 0) { alert("Historial vacío."); return; }
+            let flatData = [];
+            history.forEach(week => {
+                week.records.forEach(r => {
+                    flatData.push({ "Semana": r.Semana, "Día": r.Dia, "Hora": r.Hora, "Lugar": r.Lugar, "Grupo": r.Grupo, "Territorio": r.Territorio, "Conductor": r.Conductor, "Fecha": week.date });
+                });
+            });
+            const ws = XLSX.utils.json_to_sheet(flatData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Historial");
+            XLSX.writeFile(wb, "Historial_Salidas.xlsx");
+        }
+
+        renderHistory();
+    </script>
+
+</body>
+</html>

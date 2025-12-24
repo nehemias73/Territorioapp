@@ -51,14 +51,20 @@
             <a href="tarjetas.html" class="menu-card card-tarjetas" onclick="navegar('Tarjeta de Territorios')">
                 <span class="menu-icon">📇</span>
                 <span class="menu-title">Tarjetas</span>
-                <span class="menu-desc">Asignar y gestionar tarjetas individuales.</span>
+                <span class="menu-desc">Ver las tarjetas de territorio (S-12).</span>
             </a>
 
             <!-- Opción 3: Registro -->
-            <a href="app.html" class="menu-card card-registro" onclick="navegar('Registro S-13')">
+            <a href="app.html" class="menu-card card-registro" onclick="verificarAcceso('app.html?view=records')">
                 <span class="menu-icon">📋</span>
                 <span class="menu-title">Registro</span>
                 <span class="menu-desc">Control general y formulario S-13.</span>
+            </a>
+
+            <a href="salidas.html" class="menu-card card-salidas" onclick="verificarAcceso('app.html?view=records')">
+                <span class="menu-icon">📋</span>
+                <span class="menu-title">Generador de salidas</span>
+                <span class="menu-desc">Para crear las salidas al territorio.</span>
             </a>
 
         </div>
@@ -72,6 +78,21 @@
         function navegar(seccion) {
             console.log("Navegando a: " + seccion);
             // Aquí puedes agregar lógica adicional si es necesario
+        }
+        function verificarAcceso(urlDestino) {
+            // --- CONFIGURACIÓN ---
+            const contrasenaCorrecta = "1234"; // <--- CAMBIA TU CONTRASEÑA AQUÍ
+            // ---------------------
+
+            const entrada = prompt("🔒 Esta sección es restringida.\nPor favor, ingrese la contraseña de administrador:");
+
+            if (entrada === contrasenaCorrecta) {
+                // Si la contraseña coincide, vamos a la página
+                location.href = urlDestino;
+            } else if (entrada !== null) {
+                // Si escribió algo mal (y no canceló), mostramos error
+                alert("⛔ Contraseña incorrecta. Acceso denegado.");
+            }
         }
     </script>
 

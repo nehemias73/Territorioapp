@@ -16,6 +16,7 @@
     --color-menu-mapas: #4CAF50;    /* Verde */
     --color-menu-tarjetas: #FF9800; /* Naranja */
     --color-menu-registro: #2196F3; /* Azul */
+    --color-menu-salidas: #f3212c; /* Rojo */
 
     --radius: 8px;
     --shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -52,23 +53,23 @@ header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
     width: 100%;
     box-sizing: border-box;
 }
-/* Botón volver */
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    color: var(--color-text);
-    text-decoration: none;
-    font-weight: 500;
-    padding: 10px 15px;
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    transition: 0.2s;
-}
-.back-link:hover { color: var(--color-primary); transform: translateX(-3px); }
 
+/* Botón volver */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 15px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: 0.2s;
+        }
+        .back-link:hover { color: var(--color-primary); transform: translateX(-3px); }
 /* Barra de Herramientas */
 .search-container {
     margin-bottom: 20px;
@@ -317,7 +318,7 @@ textarea { resize: vertical; }
 .card-mapas { border-top-color: var(--color-menu-mapas); }
 .card-tarjetas { border-top-color: var(--color-menu-tarjetas); }
 .card-registro { border-top-color: var(--color-menu-registro); }
-
+.card-salidas { border-top-color: var(--color-menu-salidas); }
 /* Footer */
 footer {
     text-align: center;
@@ -334,5 +335,4 @@ footer {
         max-width: 400px;
         margin: 0 auto;
     }
-
 }
