@@ -3,82 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú Principal - Territorios</title>
-    <!-- Referencia al archivo de estilos único -->
+    <title>Gestión de Territorios - Menú</title>
     <link rel="stylesheet" href="styles.css">
-    
-    <style>
-        /* AJUSTES ESPECÍFICOS PARA EL MENÚ */
-        
-        /* 1. Aumentamos el ancho máximo para dar espacio a los 3 botones en línea */
-        .container-menu {
-            max-width: 1000px; 
-        }
-
-        /* 2. Grid Responsive Mejorado */
-        .grid-menu {
-            display: grid;
-            /* Lógica Responsive:
-               - repeat(auto-fit, ...): Pone tantas columnas como quepan.
-               - minmax(220px, 1fr): Cada tarjeta mide mínimo 220px. 
-                 Si la pantalla es ancha, caben 3. Si se achica, bajan automáticamente.
-            */
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
 
     <header>
-        <h1>Gestión de Territorios</h1>
-        <p>Seleccione una opción para comenzar</p>
+        <div class="header-content">
+            <h1>Gestión de Territorios</h1>
+        </div>
     </header>
 
-    <!-- Usamos 'container' que ya existe y 'container-menu' para ajustes específicos -->
-    <div class="container container-menu">
-        <div class="grid-menu">
+    <div class="container">
+        <!-- VISTA: MENÚ PRINCIPAL EN FORMATO GRID -->
+        <div class="grid">
             
-            <!-- Opción 1: Mapas -->
-            <a href="mapas.html" class="menu-card card-mapas" onclick="navegar('Mapas')">
+            <!-- Botón 1: Tarjetas (Acceso libre) -->
+            <button class="menu-item" onclick="location.href='app.html?view=cards'" style="border-left-color: #4A6DA7;">
+                <span class="menu-icon">🗂️</span>
+                <span class="menu-text">Tarjetas de Territorio</span>
+                <span class="menu-desc">Ver las tarjetas de los territorio (S-12).</span>
+            </button>
+
+            <!-- Botón 2: Mapas (Acceso libre) -->
+            <button class="menu-item" onclick="location.href='mapas.html'" style="border-left-color: #EA4335;">
                 <span class="menu-icon">🗺️</span>
-                <span class="menu-title">Mapas</span>
-                <span class="menu-desc">Ver y editar los mapas de la congregación.</span>
-            </a>
+                <span class="menu-text">Mapa del Territorio</span>
+                <span class="menu-desc">Consulta los planos digitales interactivos o accede a versiones PDF.</span>
+            </button>
 
-            <!-- Opción 2: Tarjetas de Territorio -->
-            <a href="tarjetas.html" class="menu-card card-tarjetas" onclick="navegar('Tarjeta de Territorios')">
-                <span class="menu-icon">📇</span>
-                <span class="menu-title">Tarjetas</span>
-                <span class="menu-desc">Ver las tarjetas de territorio (S-12).</span>
-            </a>
+            <!-- Botón 3: Registros (CON CONTRASEÑA) -->
+            <!-- Nota: Llamamos a verificarAcceso en lugar de ir directo al link -->
+            <button class="menu-item" onclick="verificarAcceso('app.html?view=records')" style="border-left-color: #FF9800;">
+                <span class="menu-icon">📄</span>
+                <span class="menu-text">Registros S-13-S 🔒</span>
+                <span class="menu-desc">Genera el historial completo e imprime el registro oficial. (Restringido)</span>
+            </button>
 
-            <!-- Opción 3: Registro -->
-            <a href="app.html" class="menu-card card-registro" onclick="verificarAcceso('app.html?view=records')">
-                <span class="menu-icon">📋</span>
-                <span class="menu-title">Registro</span>
-                <span class="menu-desc">Control general y formulario S-13.</span>
-            </a>
-
-            <a href="salidas.html" class="menu-card card-salidas" onclick="verificarAcceso('app.html?view=records')">
-                <span class="menu-icon">📋</span>
-                <span class="menu-title">Generador de salidas</span>
-                <span class="menu-desc">Para crear las salidas al territorio.</span>
-            </a>
-
+            <button class="menu-item" onclick="verificarAcceso('app.html?view=records')" style="border-left-color: #ff002b;">
+                <span class="menu-icon">📄</span>
+                <span class="menu-text">Gestor de Salidas 🔒</span>
+                <span class="menu-desc">Genera las salidas al ministerio. (Restringido)</span>
+            </button>
+            
         </div>
     </div>
 
-    <footer>
-        &copy; 2024 Gestión de Territorios
-    </footer>
-
+    <!-- Script de Seguridad Simple -->
     <script>
-        function navegar(seccion) {
-            console.log("Navegando a: " + seccion);
-            // Aquí puedes agregar lógica adicional si es necesario
-        }
         function verificarAcceso(urlDestino) {
             // --- CONFIGURACIÓN ---
             const contrasenaCorrecta = "1234"; // <--- CAMBIA TU CONTRASEÑA AQUÍ
