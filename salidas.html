@@ -226,6 +226,17 @@
             outline: none;
         }
 
+        /* Estilo especial para el input de Grupo */
+        .cell-input.group-input {
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+        .cell-input.group-input:hover {
+            background-color: #e3f2fd;
+        }
+
         .cell-input.day-name {
             background: transparent;
             font-weight: 700;
@@ -248,7 +259,6 @@
             border-radius: 8px;
             letter-spacing: 1px;
             margin-top: 20px;
-            /* Asegura que ocupe todo el ancho */
             width: 100%;
             display: block; 
             box-sizing: border-box;
@@ -258,7 +268,6 @@
             background-color: var(--color-weekend) !important;
         }
 
-        /* Estilos de la fila espaciadora (la que contiene el header) */
         .spacer-row td {
             background: transparent !important;
             border: none !important;
@@ -277,9 +286,9 @@
         .row-controls {
             display: flex;
             align-items: center;
-            justify-content: center; /* Centrado perfecto */
+            justify-content: center;
             gap: 8px;
-            height: 100%; /* Ocupar altura total */
+            height: 100%;
         }
 
         .row-checkbox {
@@ -326,6 +335,88 @@
         }
         .history-table th { color: var(--color-primary); }
 
+        /* --- MODAL DE SELECCIÓN DE GRUPO --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 320px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: popIn 0.2s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            margin: 0 0 20px 0;
+            color: var(--color-primary);
+            font-size: 1.2rem;
+        }
+
+        .group-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn-group-option {
+            background-color: #f0f4f8;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-group-option:hover, .btn-group-option:active {
+            background-color: var(--color-primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-group-all {
+            grid-column: span 3; /* Ocupa todo el ancho */
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .btn-group-all:hover {
+            background-color: #2e7d32;
+            color: white;
+        }
+
+        .btn-modal-close {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 10px;
+        }
+
         /* Footer */
         footer {
             text-align: center;
@@ -340,22 +431,16 @@
         @media (max-width: 768px) {
             .container { padding: 10px; margin: 10px auto; }
             .card { padding: 15px; }
-
-            /* Ocultar cabeceras de tabla tradicionales */
             .schedule-table thead { display: none; }
-
-            /* Filas como bloques/tarjetas */
             .schedule-table, .schedule-table tbody, .schedule-table tr, .schedule-table td {
                 display: block;
                 width: 100%;
                 box-sizing: border-box;
             }
 
-            /* --- ARREGLO DE ENCABEZADOS DE GRUPO EN MÓVIL --- */
-            /* En lugar de ocultar la fila espaciadora, la transformamos */
             .spacer-row {
                 display: block !important;
-                margin-top: 25px; /* Espacio antes del título */
+                margin-top: 25px;
                 margin-bottom: 10px;
                 background: transparent !important;
                 border: none !important;
@@ -369,17 +454,8 @@
                 background: transparent !important;
             }
             
-            /* Ocultamos la primera celda vacía (la del icono de control) */
-            .spacer-row td:first-child { 
-                display: none !important; 
-            }
-            
-            /* Aseguramos que la celda con el título se vea bien */
-            .spacer-row td:last-child {
-                width: 100% !important;
-            }
-
-            /* ----------------------------------------------- */
+            .spacer-row td:first-child { display: none !important; }
+            .spacer-row td:last-child { width: 100% !important; }
 
             .row-entry {
                 background: #fff;
@@ -390,7 +466,6 @@
                 padding: 10px;
             }
 
-            /* Quitar bordes y estilos de tabla Desktop */
             .row-entry td {
                 border: none !important;
                 border-radius: 0 !important;
@@ -401,7 +476,6 @@
                 text-align: right;
             }
 
-            /* Pseudo-elemento para Labels en Móvil */
             .row-entry td::before {
                 content: attr(data-label);
                 font-weight: 600;
@@ -409,15 +483,14 @@
                 font-size: 0.9rem;
                 margin-right: 15px;
                 text-align: left;
-                flex-shrink: 0; /* Que no se aplaste */
+                flex-shrink: 0;
             }
 
-            /* Ajustes para inputs en móvil */
-            .cell-input {
-                text-align: right; /* Alinear texto a derecha en móvil */
-            }
+            .cell-input { text-align: right; }
+            
+            /* El input de grupo en móvil se alinea a la derecha también */
+            .cell-input.group-input { text-align: right; }
 
-            /* Controles (Checkbox y botón) */
             .col-control-cell {
                 display: flex !important;
                 justify-content: space-between !important;
@@ -427,62 +500,33 @@
                 border-radius: 8px;
                 margin-bottom: 10px;
             }
-            .col-control-cell::before {
-                content: "Opciones:";
-                color: #555;
-            }
+            .col-control-cell::before { content: "Opciones:"; color: #555; }
         }
 
-        /* --- ESTILOS DE IMPRESIÓN (PDF - VERTICAL) --- */
+        /* --- ESTILOS DE IMPRESIÓN --- */
         @media print {
-            @page {
-                size: portrait;
-                margin: 0.8cm;
-            }
-
-            header, footer, .btn, .back-link, .no-print, .col-control, .history-panel {
+            @page { size: portrait; margin: 0.8cm; }
+            header, footer, .btn, .back-link, .no-print, .col-control, .history-panel, .modal-overlay {
                 display: none !important;
             }
             
-            /* Forzar tabla normal en impresión aunque sea móvil */
             .schedule-table thead { display: table-header-group !important; }
             .schedule-table, .schedule-table tbody { display: table !important; width: 100%; }
             .schedule-table tr { display: table-row !important; }
             .schedule-table td { display: table-cell !important; }
             
-            .row-entry td::before { content: none !important; } /* Quitar labels móviles */
+            .row-entry td::before { content: none !important; }
             
-            /* En impresión, el header se ve normal como fila de tabla */
             .spacer-row { display: table-row !important; }
             .spacer-row td { display: table-cell !important; }
-            .spacer-row td:first-child { display: table-cell !important; } /* Mostramos celda vacía para alinear */
+            .spacer-row td:first-child { display: table-cell !important; }
 
             tr.row-disabled { display: none !important; }
 
-            body {
-                background-color: white;
-                font-size: 9pt;
-            }
-
-            .container {
-                max-width: 100%;
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
-
-            .card {
-                box-shadow: none;
-                border: none;
-                padding: 0;
-            }
-
-            .schedule-title {
-                margin-bottom: 15px;
-                font-size: 1.4rem;
-                padding-bottom: 10px;
-            }
-
+            body { background-color: white; font-size: 9pt; }
+            .container { max-width: 100%; margin: 0; padding: 0; box-shadow: none; }
+            .card { box-shadow: none; border: none; padding: 0; }
+            .schedule-title { margin-bottom: 15px; font-size: 1.4rem; padding-bottom: 10px; }
             .schedule-table { border-spacing: 0; }
             
             .row-entry td {
@@ -490,9 +534,8 @@
                 border-bottom: 1px solid #ddd;
                 padding: 6px 4px;
                 border-radius: 0;
-                text-align: left; /* Resetear alineación móvil */
+                text-align: left;
             }
-            
             .row-entry:last-child td { border-bottom: none; }
 
             .cell-input {
@@ -504,17 +547,8 @@
                 text-align: left;
             }
             
-            .cell-input.day-name {
-                color: var(--color-primary) !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .weekend-row .cell-input.day-name {
-                color: var(--color-weekend) !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            .cell-input.day-name { color: var(--color-primary) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .weekend-row .cell-input.day-name { color: var(--color-weekend) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
             .group-header {
                 background-color: var(--color-primary) !important;
@@ -526,13 +560,7 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-            
-            .group-header-weekend {
-                background-color: var(--color-weekend) !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
+            .group-header-weekend { background-color: var(--color-weekend) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             th { font-size: 8pt; color: #666; }
         }
     </style>
@@ -549,10 +577,8 @@
         <div class="no-print">
             <a href="index.html" class="back-link">← Volver al Menú</a>
             
-            <!-- Botones Principales -->
             <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 style="margin: 0; color: #333; font-weight: 600;">Programa Semanal</h2>
-                
                 <div style="display: flex; gap: 10px;">
                     <button onclick="saveWeekToHistory()" class="btn btn-secondary" title="Guarda esta semana en el historial del navegador">💾 Guardar Semana</button>
                     <button onclick="window.print()" class="btn btn-print">🖨️ Imprimir PDF</button>
@@ -560,7 +586,7 @@
             </div>
             
             <p style="font-size: 0.9rem; color: #666; margin-bottom: 25px;">
-                Rellena los datos. Usa el botón <strong>(+)</strong> para añadir horarios y <strong>(☑)</strong> para ocultar filas.
+                Rellena los datos. Toca la columna <strong>Grupo</strong> para seleccionar opciones.
             </p>
         </div>
 
@@ -569,7 +595,6 @@
             
             <h2 class="schedule-title">Salidas para el Servicio del Campo</h2>
 
-            <!-- Campo Opcional: Fecha o Semana -->
             <div style="margin-bottom: 25px; display: flex; gap: 15px; align-items: center; justify-content: center;">
                 <label style="font-weight: bold; color: #555;">SEMANA DEL:</label>
                 <input type="text" id="week-input" class="cell-input" style="width: 250px; font-weight: bold; text-align: center; border: 1px solid #ddd;" placeholder="Ej: 24 al 30 de Diciembre">
@@ -584,393 +609,4 @@
                         <th style="width: 23%;">Punto de Encuentro</th>
                         <th style="width: 8%; text-align: center;">Grupo</th>
                         <th style="width: 20%;">Territorio</th>
-                        <th style="width: 22%;">Conductor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- LUNES A VIERNES (Fila ÚNICA, adaptada con CSS) -->
-                    <tr class="spacer-row">
-                        <td class="col-control no-print"></td>
-                        <td colspan="6"><div class="group-header">LUNES A VIERNES</div></td>
-                    </tr>
-                    
-                    <!-- Lunes -->
-                    <tr class="row-entry">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)" title="Mostrar/Ocultar">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)" title="Agregar horario">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Lunes"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-                    <!-- Martes -->
-                    <tr class="row-entry">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Martes"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-                    <!-- Miercoles -->
-                    <tr class="row-entry">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Miércoles"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-                    <!-- Jueves -->
-                    <tr class="row-entry">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Jueves"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-                    <!-- Viernes -->
-                    <tr class="row-entry">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Viernes"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-
-                    <!-- SÁBADOS -->
-                    <tr class="spacer-row">
-                        <td class="col-control no-print"></td>
-                        <td colspan="6"><div class="group-header group-header-weekend">SÁBADOS</div></td>
-                    </tr>
-                    <tr class="row-entry weekend-row">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Sábado"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:00 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-
-                    <!-- DOMINGOS -->
-                    <tr class="spacer-row">
-                        <td class="col-control no-print"></td>
-                        <td colspan="6"><div class="group-header group-header-weekend">DOMINGOS</div></td>
-                    </tr>
-                    <tr class="row-entry weekend-row">
-                        <td class="col-control-cell no-print">
-                            <div class="row-controls">
-                                <input type="checkbox" class="row-checkbox" checked onchange="toggleRow(this)">
-                                <button class="btn-circle btn-add-row" onclick="addRow(this)">+</button>
-                            </div>
-                        </td>
-                        <td data-label="Día"><input type="text" class="cell-input day-name" value="Domingo"></td>
-                        <td data-label="Hora"><input type="text" class="cell-input" value="9:30 AM"></td>
-                        <td data-label="Punto de Encuentro"><input type="text" class="cell-input" placeholder="Lugar..."></td>
-                        <td data-label="Grupo"><input type="text" class="cell-input" style="text-align: center;" placeholder="-"></td>
-                        <td data-label="Territorio"><input type="text" class="cell-input" placeholder="Territorio..."></td>
-                        <td data-label="Conductor"><input type="text" class="cell-input" placeholder="Nombre..."></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Notas adicionales -->
-            <div style="margin-top: 30px;">
-                <label style="font-weight: bold; font-size: 0.9rem; color: var(--color-primary); display: block; margin-bottom: 8px;">NOTAS / ANUNCIOS:</label>
-                <textarea class="cell-input" rows="3" style="border: 2px solid #eee; resize: vertical;" placeholder="Escribe aquí cualquier nota adicional para la semana..."></textarea>
-            </div>
-
-        </div>
-
-        <!-- PANEL DE HISTORIAL (Oculto al imprimir) -->
-        <div class="history-panel no-print">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin: 0; color: #333;">🗂️ Historial Guardado</h3>
-                <button onclick="exportHistoryToExcel()" class="btn" style="background-color: #2e7d32;">📊 Descargar Todo en Excel</button>
-            </div>
-            <p style="font-size: 0.85rem; color: #666;">
-                Aquí se guardan las semanas que vas registrando. Estos datos están en tu navegador.
-                Pulsa "Guardar Semana" arriba para añadir la actual.
-            </p>
-            
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>Semana</th>
-                        <th>Registros</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody id="history-list">
-                    <!-- Aquí se llenará con JS -->
-                </tbody>
-            </table>
-        </div>
-
-    </div>
-
-    <footer>
-        &copy; 2024 Gestión de Territorios - Salidas
-    </footer>
-
-    <script>
-        // Sincronizar inputs para impresión
-        function attachInputListeners(row) {
-            const inputs = row.querySelectorAll('.cell-input');
-            inputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    this.setAttribute('value', this.value);
-                    if(this.tagName === 'TEXTAREA') {
-                        this.innerHTML = this.value;
-                    }
-                });
-            });
-        }
-
-        // Ejecutar listeners iniciales
-        document.querySelectorAll('tr').forEach(attachInputListeners);
-
-        // Habilitar/Deshabilitar fila
-        function toggleRow(checkbox) {
-            const row = checkbox.closest('tr');
-            if (checkbox.checked) {
-                row.classList.remove('row-disabled');
-                row.querySelectorAll('.cell-input').forEach(input => input.disabled = false);
-            } else {
-                row.classList.add('row-disabled');
-                row.querySelectorAll('.cell-input').forEach(input => input.disabled = true);
-            }
-        }
-
-        // Agregar nueva fila (Clonar)
-        function addRow(btn) {
-            const currentRow = btn.closest('tr');
-            const newRow = currentRow.cloneNode(true);
-            
-            // Limpiar inputs
-            const inputs = newRow.querySelectorAll('.cell-input');
-            inputs.forEach((input, index) => {
-                if (index > 0) { // Mantener el nombre del día
-                    input.value = "";
-                    input.setAttribute('value', "");
-                }
-                if (index === 1) input.placeholder = "Hora...";
-                input.disabled = false;
-            });
-
-            // Configurar Controles (Solo Borrar)
-            const controlDiv = newRow.querySelector('.row-controls');
-            controlDiv.innerHTML = ''; 
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn-circle btn-delete-row';
-            deleteBtn.innerText = '✕';
-            deleteBtn.title = "Eliminar esta fila";
-            deleteBtn.onclick = function() { newRow.remove(); };
-            
-            const newCheckbox = document.createElement('input');
-            newCheckbox.type = 'checkbox';
-            newCheckbox.className = 'row-checkbox';
-            newCheckbox.checked = true;
-            newCheckbox.onchange = function() { toggleRow(this); };
-
-            controlDiv.appendChild(newCheckbox);
-            controlDiv.appendChild(deleteBtn);
-
-            newRow.classList.remove('row-disabled');
-            currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
-            attachInputListeners(newRow);
-        }
-
-        // ==========================================
-        // LÓGICA DE HISTORIAL Y EXCEL
-        // ==========================================
-
-        const STORAGE_KEY = 'predicacion_historial';
-
-        // 1. Obtener Historial
-        function getHistory() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
-        }
-
-        // 2. Guardar Historial
-        function saveHistory(history) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-            renderHistory();
-        }
-
-        // 3. Capturar datos de la semana actual
-        function saveWeekToHistory() {
-            const weekTitle = document.getElementById('week-input').value.trim() || 'Semana Sin Fecha';
-            const rows = document.querySelectorAll('.row-entry:not(.row-disabled)'); // Solo filas activas
-            
-            if(rows.length === 0) {
-                alert("No hay salidas activas para guardar.");
-                return;
-            }
-
-            const weekData = [];
-
-            rows.forEach(row => {
-                const inputs = row.querySelectorAll('.cell-input');
-                // Estructura basada en los índices de los inputs
-                // 0: Día, 1: Hora, 2: Lugar, 3: Grupo, 4: Territorio, 5: Conductor
-                const entry = {
-                    Semana: weekTitle,
-                    Dia: inputs[0].value,
-                    Hora: inputs[1].value,
-                    Lugar: inputs[2].value,
-                    Grupo: inputs[3].value,
-                    Territorio: inputs[4].value,
-                    Conductor: inputs[5].value
-                };
-                weekData.push(entry);
-            });
-
-            // Confirmar
-            if(!confirm(`¿Guardar ${weekData.length} registros para "${weekTitle}"?`)) return;
-
-            // Guardar en LocalStorage
-            const history = getHistory();
-            
-            // Añadimos un objeto "Semana" que contiene el array de salidas
-            history.push({
-                id: Date.now(), // ID único
-                title: weekTitle,
-                date: new Date().toLocaleDateString(),
-                records: weekData
-            });
-
-            saveHistory(history);
-            alert("✅ Semana guardada en el historial.");
-        }
-
-        // 4. Renderizar tabla de historial
-        function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            const history = getHistory();
-
-            if(history.length === 0) {
-                list.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#999;">No hay historial guardado.</td></tr>';
-                return;
-            }
-
-            // Mostrar del más reciente al más antiguo
-            history.reverse().forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${item.title}</strong> <br> <span style="font-size:0.8em; color:#888;">Guardado: ${item.date}</span></td>
-                    <td>${item.records.length} salidas</td>
-                    <td>
-                        <button class="btn btn-danger" onclick="deleteHistoryItem(${item.id})">Borrar</button>
-                    </td>
-                `;
-                list.appendChild(tr);
-            });
-        }
-
-        // 5. Borrar un item
-        function deleteHistoryItem(id) {
-            if(!confirm("¿Seguro que quieres borrar este registro del historial?")) return;
-            let history = getHistory();
-            history = history.filter(item => item.id !== id);
-            saveHistory(history);
-        }
-
-        // 6. Exportar a Excel
-        function exportHistoryToExcel() {
-            const history = getHistory();
-            if(history.length === 0) {
-                alert("No hay datos en el historial para exportar.");
-                return;
-            }
-
-            // Aplanar datos: Convertir la estructura de historial en una lista plana de filas para Excel
-            let flatData = [];
-            
-            history.forEach(week => {
-                week.records.forEach(record => {
-                    flatData.push({
-                        "Semana": record.Semana,
-                        "Día": record.Dia,
-                        "Hora": record.Hora,
-                        "Punto de Encuentro": record.Lugar,
-                        "Grupo": record.Grupo,
-                        "Territorio": record.Territorio,
-                        "Conductor": record.Conductor,
-                        "Fecha Guardado": week.date // Extra por control
-                    });
-                });
-            });
-
-            // Crear hoja de trabajo
-            const ws = XLSX.utils.json_to_sheet(flatData);
-            
-            // Ajustar ancho de columnas (cosmético)
-            const wscols = [
-                {wch: 25}, // Semana
-                {wch: 10}, // Día
-                {wch: 10}, // Hora
-                {wch: 25}, // Lugar
-                {wch: 8},  // Grupo
-                {wch: 15}, // Territorio
-                {wch: 20}, // Conductor
-                {wch: 15}  // Fecha
-            ];
-            ws['!cols'] = wscols;
-
-            // Crear libro de trabajo
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Historial Salidas");
-
-            // Generar archivo y descargar
-            XLSX.writeFile(wb, "Historial_Salidas_Predicacion.xlsx");
-        }
-
-        // Inicializar
-        renderHistory();
-
-    </script>
-
-</body>
-</html>
+                        <th style="width: 22%;">Conductor<
