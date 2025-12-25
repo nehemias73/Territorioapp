@@ -4,7 +4,260 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Territorios - Menú</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- Eliminamos el link a styles.css y ponemos los estilos aquí dentro -->
+    <style>
+        /* --- VARIABLES Y CONFIGURACIÓN --- */
+        :root {
+            --color-primary: #4A6DA7;
+            --color-bg: #F4F6F8;
+            --color-card: #FFFFFF;
+            --color-text: #333333;
+            
+            /* ESTADOS */
+            --color-success: #4CAF50;
+            --color-assigned: #D32F2F;
+            --color-info: #2196F3;
+            
+            --color-map: #EA4335;
+            --radius: 8px;
+            --shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header h1 { margin: 0; font-size: 1.5rem; font-weight: 500; }
+        header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9rem; }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Barra de Herramientas */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px; 
+            border: 1px solid #ddd;
+            border-radius: var(--radius); 
+            font-size: 1rem;
+            box-shadow: var(--shadow); 
+            outline: none;
+        }
+
+        .search-select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            box-shadow: var(--shadow);
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            width: auto !important;
+            white-space: nowrap;
+            padding: 0 20px !important;
+        }
+
+        .search-input:focus, .search-select:focus { border-color: var(--color-primary); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* --- TARJETAS Y MENÚS (Estilos Unificados) --- */
+        .card, .menu-item {
+            background: var(--color-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.2s;
+            cursor: pointer;
+            border: none; 
+            border-left: 5px solid transparent;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            /* MODIFICADO: Cambiamos left por center para centrar textos */
+            text-align: center; 
+            font-family: inherit;
+            padding: 0;
+        }
+
+        .card:hover, .menu-item:hover { transform: translateY(-3px); }
+
+        /* Colores de estado para las tarjetas de la app */
+        .card.disponible { border-left-color: var(--color-success); }
+        .card.asignado { border-left-color: var(--color-assigned); }
+        .card.completado { border-left-color: var(--color-info); }
+
+        .card-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex; 
+            /* MODIFICADO: Usamos center en lugar de space-between */
+            justify-content: center; 
+            align-items: center;
+            /* MODIFICADO: Agregamos gap para separar título e icono */
+            gap: 10px; 
+            background: white;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card-title { font-weight: bold; font-size: 1.1rem; }
+
+        .badge {
+            padding: 4px 8px; border-radius: 12px; font-size: 0.75rem;
+            color: white; text-transform: uppercase; font-weight: bold;
+        }
+        .badge.disponible { background-color: var(--color-success); }
+        .badge.asignado { background-color: var(--color-assigned); } 
+        .badge.completado { background-color: var(--color-info); }
+
+        .card-body { 
+            padding: 15px; 
+            flex-grow: 1; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .menu-desc {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .card-actions {
+            padding: 10px 15px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        .info-row {
+            margin-bottom: 8px; font-size: 0.9rem;
+            display: flex; align-items: center;
+            /* Para info-row, si quieres centrar también, descomenta: */
+            /* justify-content: center; */
+        }
+
+        /* Modal Formulario */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: none;
+            justify-content: center; align-items: center; z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: white; padding: 20px; border-radius: var(--radius);
+            width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute; top: 15px; right: 15px; background: none;
+            border: none; font-size: 1.5rem; cursor: pointer; color: #777;
+        }
+
+        .media-preview {
+            width: 100%; height: 150px; background-color: #eee;
+            margin-bottom: 10px; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            color: #888; overflow: hidden;
+        }
+        .media-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* NUEVO: Lightbox para ver imagen en grande */
+        .lightbox-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            cursor: zoom-out;
+        }
+
+        .lightbox-overlay.active { display: flex; }
+
+        .lightbox-overlay img {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            cursor: default;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
+        input, select, textarea {
+            width: 100%; padding: 10px; border: 1px solid #ddd;
+            border-radius: 4px; font-size: 1rem; box-sizing: border-box; font-family: inherit;
+        }
+        textarea { resize: vertical; }
+
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 4px;
+            font-size: 1rem; cursor: pointer; font-weight: bold;
+            transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none; 
+        }
+
+        .btn-primary { background-color: var(--color-primary); color: white; }
+        .btn-primary:hover { background-color: #3b5a8c; }
+        .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .btn-map {
+            background-color: white; color: var(--color-map);
+            border: 1px solid var(--color-map);
+            padding: 8px; font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-map:hover { background-color: #fff5f5; }
+
+        .loading { text-align: center; padding: 40px; font-size: 1.2rem; color: #666; }
+    </style>
 </head>
 <body>
 
@@ -19,31 +272,46 @@
         <div class="grid">
             
             <!-- Botón 1: Tarjetas (Acceso libre) -->
-            <button class="menu-item" onclick="location.href='app.html?view=cards'" style="border-left-color: #4A6DA7;">
-                <span class="menu-icon">🗂️</span>
-                <span class="menu-text">Tarjetas de Territorio</span>
-                <span class="menu-desc">Ver las tarjetas de los territorio (S-12).</span>
+            <button class="menu-item" onclick="location.href='tarjetas.html'" style="border-left-color: #4A6DA7; padding: 0;">
+                <div class="card-header">
+                    <span class="card-title" style="color: #4A6DA7;">Tarjetas de Territorio</span>
+                    <span class="menu-icon" style="font-size: 1.5rem; margin: 0;">🗂️</span>
+                </div>
+                <div class="card-body">
+                    <span class="menu-desc">Gestiona la asignación y el estado actual de los territorios.</span>
+                </div>
             </button>
 
             <!-- Botón 2: Mapas (Acceso libre) -->
-            <button class="menu-item" onclick="location.href='mapas.html'" style="border-left-color: #EA4335;">
-                <span class="menu-icon">🗺️</span>
-                <span class="menu-text">Mapa del Territorio</span>
-                <span class="menu-desc">Consulta los planos digitales interactivos o accede a versiones PDF.</span>
+            <button class="menu-item" onclick="location.href='mapas.html'" style="border-left-color: #189128; padding: 0;">
+                <div class="card-header">
+                    <span class="card-title" style="color: #189128;">Mapa del Territorio</span>
+                    <span class="menu-icon" style="font-size: 1.5rem; margin: 0;">🗺️</span>
+                </div>
+                <div class="card-body">
+                    <span class="menu-desc">Consulta los planos digitales interactivos o accede a versiones PDF.</span>
+                </div>
             </button>
 
             <!-- Botón 3: Registros (CON CONTRASEÑA) -->
-            <!-- Nota: Llamamos a verificarAcceso en lugar de ir directo al link -->
-            <button class="menu-item" onclick="verificarAcceso('app.html?view=records')" style="border-left-color: #FF9800;">
-                <span class="menu-icon">📄</span>
-                <span class="menu-text">Registros S-13-S 🔒</span>
-                <span class="menu-desc">Genera el historial completo e imprime el registro oficial. (Restringido)</span>
+            <button class="menu-item" onclick="verificarAcceso('app.html?view=records')" style="border-left-color: #FF9800; padding: 0;">
+                <div class="card-header">
+                    <span class="card-title" style="color: #FF9800;">Registros S-13-S 🔒</span>
+                    <span class="menu-icon" style="font-size: 1.5rem; margin: 0;">📄</span>
+                </div>
+                <div class="card-body">
+                    <span class="menu-desc">Genera el historial completo e imprime el registro oficial. (Restringido)</span>
+                </div>
             </button>
 
-            <button class="menu-item" onclick="verificarAcceso('app.html?view=records')" style="border-left-color: #ff002b;">
-                <span class="menu-icon">📄</span>
-                <span class="menu-text">Gestor de Salidas 🔒</span>
-                <span class="menu-desc">Genera las salidas al ministerio. (Restringido)</span>
+            <button class="menu-item" onclick="verificarAcceso('salidas.html')" style="border-left-color: #ff0022; padding: 0;">
+                <div class="card-header">
+                    <span class="card-title" style="color: #ff0022;">Salidas 🔒</span>
+                    <span class="menu-icon" style="font-size: 1.5rem; margin: 0;">📆</span>
+                </div>
+                <div class="card-body">
+                    <span class="menu-desc">Creador de salidas para el ministerio (Restringido)</span>
+                </div>
             </button>
             
         </div>
@@ -53,16 +321,16 @@
     <script>
         function verificarAcceso(urlDestino) {
             // --- CONFIGURACIÓN ---
-            const contrasenaCorrecta = "1234"; // <--- CAMBIA TU CONTRASEÑA AQUÍ
+            // Lista de contraseñas válidas (puedes agregar las que quieras entre comillas y separadas por comas)
+            const contrasenasValidas = ["1234", "admin", "2025", "siervo"]; 
             // ---------------------
 
-            const entrada = prompt("🔒 Esta sección es restringida.\nPor favor, ingrese la contraseña de administrador:");
+            const entrada = prompt("🔒 Esta sección es restringida.\nPor favor, ingrese una contraseña válida:");
 
-            if (entrada === contrasenaCorrecta) {
-                // Si la contraseña coincide, vamos a la página
+            // Verificamos si lo que escribió el usuario (entrada) existe en nuestra lista
+            if (contrasenasValidas.includes(entrada)) {
                 location.href = urlDestino;
             } else if (entrada !== null) {
-                // Si escribió algo mal (y no canceló), mostramos error
                 alert("⛔ Contraseña incorrecta. Acceso denegado.");
             }
         }
